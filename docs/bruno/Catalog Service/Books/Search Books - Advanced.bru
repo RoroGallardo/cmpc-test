@@ -1,0 +1,46 @@
+meta {
+  name: Search Books - Advanced
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{catalog_service_url}}/books/search
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "search": "amor",
+    "available": true,
+    "page": 1,
+    "limit": 10,
+    "sortBy": "price",
+    "sortOrder": "ASC"
+  }
+}
+
+docs {
+  Búsqueda avanzada con múltiples filtros:
+  - Texto de búsqueda
+  - Solo libros disponibles
+  - Ordenamiento por precio ascendente
+  - Paginación
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("all books should be available", function() {
+    res.body.data.forEach(book => {
+      expect(book.available).to.equal(true);
+    });
+  });
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Seed Admin
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{auth_service_url}}/database/seed/admin
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Este endpoint crea el usuario admin inicial.
+  Requiere autenticación de admin.
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.status).to.equal(201);
+  });
+}

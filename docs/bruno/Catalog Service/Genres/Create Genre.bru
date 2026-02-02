@@ -1,0 +1,33 @@
+meta {
+  name: Create Genre
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{catalog_service_url}}/genres
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Ficción",
+    "description": "Obras de ficción literaria"
+  }
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return created genre", function() {
+    expect(res.body).to.have.property('id');
+    expect(res.body.name).to.equal("Ficción");
+  });
+}

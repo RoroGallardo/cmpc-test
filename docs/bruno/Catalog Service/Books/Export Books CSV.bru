@@ -1,0 +1,27 @@
+meta {
+  name: Export Books CSV
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/books/export/csv
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Accept: text/csv
+}
+
+params:query {
+  ~search: ficción
+  ~genreId: 
+  ~authorId: 
+  ~publisherId: 
+  ~available: true
+}

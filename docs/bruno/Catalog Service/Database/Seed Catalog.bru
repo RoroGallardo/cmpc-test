@@ -1,0 +1,31 @@
+meta {
+  name: Seed Catalog
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{catalog_service_url}}/database/seed/catalog
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Puebla el catálogo con datos de prueba:
+  - 8 géneros
+  - 8 autores
+  - 5 editoriales
+  - 15 libros
+  
+  Requiere autenticación de admin.
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.status).to.equal(201);
+  });
+}

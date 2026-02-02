@@ -1,0 +1,45 @@
+{
+  "name": "@cmpc-test/auth-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/auth-service/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "dependsOn": ["^build"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/auth-service",
+        "main": "apps/auth-service/src/main.ts",
+        "tsConfig": "apps/auth-service/tsconfig.json",
+        "webpackConfig": "apps/auth-service/webpack.config.js"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "@cmpc-test/auth-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@cmpc-test/auth-service:build:development"
+        },
+        "production": {
+          "buildTarget": "@cmpc-test/auth-service:build:production"
+        }
+      }
+    }
+  },
+  "tags": ["type:app", "scope:auth"]
+}

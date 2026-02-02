@@ -1,0 +1,26 @@
+meta {
+  name: Delete Book
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{catalog_service_url}}/books/REPLACE_WITH_BOOK_ID
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Elimina un libro (soft delete).
+  Reemplaza REPLACE_WITH_BOOK_ID con un UUID válido.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

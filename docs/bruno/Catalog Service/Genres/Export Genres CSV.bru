@@ -1,0 +1,19 @@
+meta {
+  name: Export Genres CSV
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/genres/export/csv
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Accept: text/csv
+}

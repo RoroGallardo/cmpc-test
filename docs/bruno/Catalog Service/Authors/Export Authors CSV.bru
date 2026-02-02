@@ -1,0 +1,19 @@
+meta {
+  name: Export Authors CSV
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/authors/export/csv
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Accept: text/csv
+}

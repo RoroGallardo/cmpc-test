@@ -1,0 +1,34 @@
+meta {
+  name: Create Author
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{catalog_service_url}}/authors
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Gabriel García Márquez",
+    "birthYear": 1927,
+    "biography": "Escritor colombiano, premio Nobel de Literatura 1982"
+  }
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return created author", function() {
+    expect(res.body).to.have.property('id');
+    expect(res.body.name).to.equal("Gabriel García Márquez");
+  });
+}

@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@cmpc-test/shared": ["../../libs/shared/src/index.ts"],
+      "@cmpc-test/utils": ["../../libs/utils/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
+}

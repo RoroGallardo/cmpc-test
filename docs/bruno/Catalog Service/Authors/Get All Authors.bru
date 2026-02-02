@@ -1,0 +1,25 @@
+meta {
+  name: Get All Authors
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{catalog_service_url}}/authors
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return array", function() {
+    expect(res.body).to.be.an('array');
+  });
+}

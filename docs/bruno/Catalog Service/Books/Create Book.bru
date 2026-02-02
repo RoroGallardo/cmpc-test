@@ -1,0 +1,43 @@
+meta {
+  name: Create Book
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{catalog_service_url}}/books
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Cien años de soledad",
+    "price": 29.99,
+    "available": true,
+    "authorId": "REPLACE_WITH_AUTHOR_ID",
+    "publisherId": "REPLACE_WITH_PUBLISHER_ID",
+    "genreId": "REPLACE_WITH_GENRE_ID",
+    "imageUrl": "https://picsum.photos/seed/cien/400/600"
+  }
+}
+
+docs {
+  Crea un nuevo libro.
+  Reemplaza los IDs de autor, editorial y género con UUIDs válidos.
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return created book", function() {
+    expect(res.body).to.have.property('id');
+    expect(res.body.title).to.equal("Cien años de soledad");
+  });
+}

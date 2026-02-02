@@ -1,0 +1,45 @@
+meta {
+  name: Search Books
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{catalog_service_url}}/books/search
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "search": "soledad",
+    "page": 1,
+    "limit": 10
+  }
+}
+
+docs {
+  Búsqueda simple de libros por texto.
+  Incluye paginación básica.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return data array", function() {
+    expect(res.body.data).to.be.an('array');
+  });
+  
+  test("should return meta object", function() {
+    expect(res.body.meta).to.have.property('total');
+    expect(res.body.meta).to.have.property('page');
+    expect(res.body.meta).to.have.property('limit');
+    expect(res.body.meta).to.have.property('totalPages');
+  });
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Update Book
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{catalog_service_url}}/books/REPLACE_WITH_BOOK_ID
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Cien años de soledad (Edición especial)",
+    "price": 34.99,
+    "available": false
+  }
+}
+
+docs {
+  Actualiza un libro existente.
+  Reemplaza REPLACE_WITH_BOOK_ID con un UUID válido.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

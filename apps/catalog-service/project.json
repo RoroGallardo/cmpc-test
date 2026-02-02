@@ -1,0 +1,45 @@
+{
+  "name": "@cmpc-test/catalog-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/catalog-service/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "dependsOn": ["^build"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/catalog-service",
+        "main": "apps/catalog-service/src/main.ts",
+        "tsConfig": "apps/catalog-service/tsconfig.json",
+        "webpackConfig": "apps/catalog-service/webpack.config.js"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "@cmpc-test/catalog-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@cmpc-test/catalog-service:build:development"
+        },
+        "production": {
+          "buildTarget": "@cmpc-test/catalog-service:build:production"
+        }
+      }
+    }
+  },
+  "tags": ["type:app", "scope:catalog"]
+}

@@ -1,0 +1,38 @@
+meta {
+  name: Login Admin
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{auth_service_url}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{admin_email}}",
+    "password": "{{admin_password}}"
+  }
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar("access_token", res.body.access_token);
+  }
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return access_token", function() {
+    expect(res.body.access_token).to.be.a('string');
+  });
+  
+  test("should return admin role", function() {
+    expect(res.body.user.role).to.equal('admin');
+  });
+}

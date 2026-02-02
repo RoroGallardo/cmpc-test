@@ -1,0 +1,25 @@
+meta {
+  name: Get All Books
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{catalog_service_url}}/books
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return data array", function() {
+    expect(res.body.data).to.be.an('array');
+  });
+}
