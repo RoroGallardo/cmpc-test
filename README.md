@@ -1,7 +1,6 @@
 # CMPC Test - Monorepo
 
-[![Tests](https://github.com/TU_USUARIO/cmpc-test/actions/workflows/test.yml/badge.svg)](https://github.com/TU_USUARIO/cmpc-test/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/TU_USUARIO/cmpc-test/branch/main/graph/badge.svg)](https://codecov.io/gh/TU_USUARIO/cmpc-test)
+[![Tests Microservicios](https://github.com/TU_USUARIO/cmpc-test/actions/workflows/test.yml/badge.svg)](https://github.com/TU_USUARIO/cmpc-test/actions/workflows/test-microservices.yml)
 
 Monorepo con microservicios NestJS para gestión de biblioteca y autenticación.
 
