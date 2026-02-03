@@ -1,0 +1,46 @@
+meta {
+  name: Demand Prediction for Book
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{catalog_service_url}}/predictive/demand/:bookId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene predicción de demanda para un libro específico:
+  - Demanda predicha para los próximos 7 días
+  - Demanda predicha para los próximos 30 días
+  - Tendencia (increasing, stable, decreasing)
+  - Nivel de confianza de la predicción
+  - Ventas históricas utilizadas
+  
+  Usa algoritmo de media móvil ponderada exponencialmente.
+  
+  Requiere autenticación.
+  
+  Ejemplo de bookId: copiar desde Get All Books
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have predictions", function() {
+    expect(res.body).to.have.property('predicted7Days');
+    expect(res.body).to.have.property('predicted30Days');
+  });
+  
+  test("should have trend", function() {
+    expect(res.body).to.have.property('trend');
+    expect(['increasing', 'stable', 'decreasing']).to.include(res.body.trend);
+  });
+}

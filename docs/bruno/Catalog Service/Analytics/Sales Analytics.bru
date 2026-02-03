@@ -1,0 +1,50 @@
+meta {
+  name: Sales Analytics
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{catalog_service_url}}/analytics/sales?startDate=2026-01-01&endDate=2026-02-03
+  body: none
+  auth: bearer
+}
+
+params:query {
+  startDate: 2026-01-01
+  endDate: 2026-02-03
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene análisis detallado de ventas en un rango de fechas:
+  - Ventas por día
+  - Ventas por categoría/género
+  - Ventas por autor
+  - Totales y promedios
+  
+  Parámetros opcionales:
+  - startDate: Fecha de inicio (YYYY-MM-DD)
+  - endDate: Fecha de fin (YYYY-MM-DD)
+  
+  Requiere autenticación.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have daily sales", function() {
+    expect(res.body).to.have.property('salesByDay');
+    expect(res.body.salesByDay).to.be.an('array');
+  });
+  
+  test("should have category breakdown", function() {
+    expect(res.body).to.have.property('salesByCategory');
+    expect(res.body.salesByCategory).to.be.an('array');
+  });
+}

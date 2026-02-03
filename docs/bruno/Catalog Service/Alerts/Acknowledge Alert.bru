@@ -1,0 +1,39 @@
+meta {
+  name: Acknowledge Alert
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{catalog_service_url}}/alerts/:alertId/acknowledge
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Marca una alerta como reconocida (acknowledged):
+  - Cambia el estado de ACTIVE a ACKNOWLEDGED
+  - Indica que alguien está trabajando en resolver el problema
+  - No elimina la alerta, solo cambia su estado
+  
+  Útil para workflows de equipo donde se asignan tareas.
+  
+  Requiere autenticación.
+  
+  Ejemplo de alertId: copiar desde Get All Alerts
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("alert should be acknowledged", function() {
+    expect(res.body).to.have.property('status');
+    expect(res.body.status).to.equal('ACKNOWLEDGED');
+  });
+}

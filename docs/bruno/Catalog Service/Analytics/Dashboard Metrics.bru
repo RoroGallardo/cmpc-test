@@ -1,0 +1,47 @@
+meta {
+  name: Dashboard Metrics
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{catalog_service_url}}/analytics/dashboard
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene métricas del dashboard en tiempo real:
+  - Ventas de hoy, esta semana y este mes
+  - Resumen de inventario (stock total, valor, libros con stock bajo)
+  - Top 10 libros más vendidos
+  - Comparación con periodo anterior
+  
+  Requiere autenticación.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have sales data", function() {
+    expect(res.body).to.have.property('salesToday');
+    expect(res.body).to.have.property('salesThisWeek');
+    expect(res.body).to.have.property('salesThisMonth');
+  });
+  
+  test("should have inventory summary", function() {
+    expect(res.body).to.have.property('inventorySummary');
+    expect(res.body.inventorySummary).to.have.property('totalStock');
+  });
+  
+  test("should have top sellers", function() {
+    expect(res.body).to.have.property('topSellingBooks');
+    expect(res.body.topSellingBooks).to.be.an('array');
+  });
+}

@@ -1,0 +1,57 @@
+meta {
+  name: Seasonality Report
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{catalog_service_url}}/reports/seasonality?months=12
+  body: none
+  auth: bearer
+}
+
+params:query {
+  months: 12
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Genera reporte de estacionalidad de ventas:
+  - Ventas por mes del año
+  - Ventas por día de la semana
+  - Patrones de demanda estacionales
+  - Identifica meses/días pico y bajos
+  
+  Útil para planificación de inventario y campañas.
+  
+  Parámetros opcionales:
+  - months: Número de meses a analizar (default: 12)
+  
+  Requiere autenticación.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have monthly data", function() {
+    expect(res.body).to.have.property('byMonth');
+    expect(res.body.byMonth).to.be.an('array');
+  });
+  
+  test("should have weekly data", function() {
+    expect(res.body).to.have.property('byDayOfWeek');
+    expect(res.body.byDayOfWeek).to.be.an('array');
+  });
+  
+  test("monthly data should have required fields", function() {
+    if (res.body.byMonth.length > 0) {
+      expect(res.body.byMonth[0]).to.have.property('month');
+      expect(res.body.byMonth[0]).to.have.property('totalSales');
+    }
+  });
+}

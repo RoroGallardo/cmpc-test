@@ -1,0 +1,52 @@
+meta {
+  name: Get All Alerts
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{catalog_service_url}}/alerts?status=ACTIVE
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~status: ACTIVE
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene todas las alertas del sistema:
+  - Alertas activas, resueltas o descartadas
+  - Información del libro relacionado
+  - Nivel de severidad y tipo de alerta
+  - Metadata adicional para tomar acción
+  
+  Parámetros opcionales:
+  - status: Estado de la alerta (ACTIVE, ACKNOWLEDGED, RESOLVED, DISMISSED)
+  
+  Requiere autenticación.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return alerts array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("each alert should have required fields", function() {
+    if (res.body.length > 0) {
+      expect(res.body[0]).to.have.property('id');
+      expect(res.body[0]).to.have.property('type');
+      expect(res.body[0]).to.have.property('severity');
+      expect(res.body[0]).to.have.property('status');
+      expect(res.body[0]).to.have.property('message');
+    }
+  });
+}

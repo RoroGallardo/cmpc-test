@@ -1,0 +1,52 @@
+meta {
+  name: Restock Recommendations
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{catalog_service_url}}/predictive/restock-recommendations
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene recomendaciones inteligentes de reabastecimiento:
+  - Libros que requieren reabastecimiento urgente
+  - Cantidad recomendada a pedir
+  - Nivel de urgencia (low, medium, high, critical)
+  - Días estimados hasta quedar sin stock
+  - Priorización basada en demanda predicha vs stock actual
+  
+  Ideal para generar órdenes de compra automáticas.
+  
+  Requiere autenticación.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return recommendations array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("each recommendation should have urgency", function() {
+    if (res.body.length > 0) {
+      expect(res.body[0]).to.have.property('urgency');
+      expect(['low', 'medium', 'high', 'critical']).to.include(res.body[0].urgency);
+    }
+  });
+  
+  test("should have recommended quantity", function() {
+    if (res.body.length > 0) {
+      expect(res.body[0]).to.have.property('recommendedQuantity');
+      expect(res.body[0].recommendedQuantity).to.be.a('number');
+    }
+  });
+}

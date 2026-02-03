@@ -1,0 +1,61 @@
+meta {
+  name: Audit Trail Report
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{catalog_service_url}}/reports/audit-trail?entityType=BOOK&startDate=2026-01-01&endDate=2026-02-03
+  body: none
+  auth: bearer
+}
+
+params:query {
+  entityType: BOOK
+  startDate: 2026-01-01
+  endDate: 2026-02-03
+  ~action: 
+  ~userId: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Genera reporte de auditoría completo:
+  - Historial de cambios por entidad
+  - Usuario que realizó cada cambio
+  - Fecha y hora de modificaciones
+  - Valores anteriores y nuevos
+  - Cambios campo por campo
+  - IP y User Agent
+  
+  Parámetros opcionales:
+  - entityType: Tipo de entidad (BOOK, AUTHOR, PUBLISHER, GENRE)
+  - action: Acción (CREATE, UPDATE, DELETE)
+  - userId: ID del usuario que realizó el cambio
+  - startDate: Fecha de inicio (YYYY-MM-DD)
+  - endDate: Fecha de fin (YYYY-MM-DD)
+  
+  Requiere autenticación de admin.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return audit logs array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("each log should have required fields", function() {
+    if (res.body.length > 0) {
+      expect(res.body[0]).to.have.property('action');
+      expect(res.body[0]).to.have.property('entityType');
+      expect(res.body[0]).to.have.property('userEmail');
+      expect(res.body[0]).to.have.property('createdAt');
+    }
+  });
+}

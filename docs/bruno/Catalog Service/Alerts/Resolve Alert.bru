@@ -1,0 +1,43 @@
+meta {
+  name: Resolve Alert
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{catalog_service_url}}/alerts/:alertId/resolve
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Marca una alerta como resuelta:
+  - Cambia el estado a RESOLVED
+  - Indica que el problema fue solucionado
+  - La alerta permanece en el historial
+  
+  Ejemplo: después de reabastecer stock de un libro con alerta LOW_STOCK.
+  
+  Requiere autenticación.
+  
+  Ejemplo de alertId: copiar desde Get All Alerts
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("alert should be resolved", function() {
+    expect(res.body).to.have.property('status');
+    expect(res.body.status).to.equal('RESOLVED');
+  });
+  
+  test("should have resolved timestamp", function() {
+    expect(res.body).to.have.property('resolvedAt');
+  });
+}

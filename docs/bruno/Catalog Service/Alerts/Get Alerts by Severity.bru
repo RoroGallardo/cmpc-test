@@ -1,0 +1,45 @@
+meta {
+  name: Get Alerts by Severity
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{catalog_service_url}}/alerts/severity/CRITICAL
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene alertas filtradas por nivel de severidad:
+  
+  Niveles de severidad:
+  - LOW: Información, no requiere acción inmediata
+  - MEDIUM: Atención recomendada pronto
+  - HIGH: Requiere atención prioritaria
+  - CRITICAL: Acción inmediata requerida
+  
+  Útil para priorización y dashboards.
+  
+  Requiere autenticación.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return alerts array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("all alerts should match requested severity", function() {
+    res.body.forEach(alert => {
+      expect(alert.severity).to.equal('CRITICAL');
+    });
+  });
+}

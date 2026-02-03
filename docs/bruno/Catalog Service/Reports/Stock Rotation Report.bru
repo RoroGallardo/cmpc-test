@@ -1,0 +1,55 @@
+meta {
+  name: Stock Rotation Report
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{catalog_service_url}}/reports/stock-rotation
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Genera reporte de rotación de inventario:
+  - Tasa de rotación por producto
+  - Clasificación: Fast Moving, Normal, Slow Moving, Dead Stock
+  - Días promedio para vender
+  - Identificación de productos obsoletos
+  - Recomendaciones de acción
+  
+  Criterios de clasificación:
+  - Fast Moving: rotación > 2.0
+  - Normal: rotación entre 0.5 - 2.0
+  - Slow Moving: rotación entre 0.1 - 0.5
+  - Dead Stock: rotación < 0.1
+  
+  Requiere autenticación.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return rotation data array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("each item should have rotation category", function() {
+    if (res.body.length > 0) {
+      expect(res.body[0]).to.have.property('category');
+      expect(['Fast Moving', 'Normal', 'Slow Moving', 'Dead Stock']).to.include(res.body[0].category);
+    }
+  });
+  
+  test("should have rotation rate", function() {
+    if (res.body.length > 0) {
+      expect(res.body[0]).to.have.property('rotationRate');
+    }
+  });
+}
