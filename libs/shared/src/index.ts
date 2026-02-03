@@ -4,6 +4,13 @@ export * from './entities/publisher.entity';
 export * from './entities/genre.entity';
 export * from './entities/book.entity';
 export * from './entities/user.entity';
+export * from './entities/audit-log.entity';
+export * from './entities/inventory-snapshot.entity';
+export * from './entities/alert.entity';
+export * from './entities/inventory.entity';
+export * from './entities/stock-movement.entity';
+export * from './entities/sale.entity';
+export * from './entities/book-analytics.entity';
 
 // ============= INTERFACES =============
 export * from './interfaces/author.interface';
@@ -31,6 +38,9 @@ export * from './auth/jwt-auth.guard';
 export * from './auth/jwt.strategy';
 export * from './auth/roles.guard';
 export * from './auth/roles.decorator';
+
+// ============= INTERCEPTORS =============
+export * from './interceptors';
 
 // ============= CONFIG =============
 export * from './config/winston.config';
