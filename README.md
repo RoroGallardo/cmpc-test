@@ -1,6 +1,30 @@
 # CMPC Test - Monorepo
 
+[![Tests](https://github.com/TU_USUARIO/cmpc-test/actions/workflows/test.yml/badge.svg)](https://github.com/TU_USUARIO/cmpc-test/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/TU_USUARIO/cmpc-test/branch/main/graph/badge.svg)](https://codecov.io/gh/TU_USUARIO/cmpc-test)
+
 Monorepo con microservicios NestJS para gestión de biblioteca y autenticación.
+
+## 🧪 Tests y Coverage
+
+- **Total de Tests**: 83 ✅
+- **Coverage**: 100% Statements | 92.92% Branches | 100% Functions | 100% Lines
+
+```bash
+# Ejecutar todos los tests
+npm test
+
+# Ejecutar tests con coverage
+npm run test:cov
+
+# Tests por servicio
+npm run test:auth
+npm run test:catalog
+npm run test:shared
+
+# Modo watch
+npm run test:watch
+```
 
 ## Estructura del Proyecto
 

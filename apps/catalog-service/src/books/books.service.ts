@@ -255,25 +255,4 @@ export class BooksService {
     return parser.parse(data);
   }
 
-  private async validateRelations(
-    authorId: string,
-    publisherId: string,
-    genreId: string,
-  ): Promise<void> {
-    const [author, publisher, genre] = await Promise.all([
-      this.authorRepository.findOne({ where: { id: authorId } }),
-      this.publisherRepository.findOne({ where: { id: publisherId } }),
-      this.genreRepository.findOne({ where: { id: genreId } }),
-    ]);
-
-    if (!author) {
-      throw new BadRequestException(`Autor con ID ${authorId} no encontrado`);
-    }
-    if (!publisher) {
-      throw new BadRequestException(`Editorial con ID ${publisherId} no encontrada`);
-    }
-    if (!genre) {
-      throw new BadRequestException(`Género con ID ${genreId} no encontrado`);
-    }
-  }
 }
