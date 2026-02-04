@@ -168,7 +168,7 @@ export class AlertsService {
         bookTitle: inv.book.title,
         message: `¡Sin stock! "${inv.book.title}" no tiene unidades disponibles`,
         metadata: {
-          lastRestockDate: inv.lastRestockDate,
+          currentStock: inv.currentStock,
         },
       });
     }

@@ -35,9 +35,6 @@ export class Sale {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'sale_number', unique: true })
-  saleNumber!: string; // Ej: SALE-2026-00001
-
   // Cliente
   @Column({ name: 'customer_id', nullable: true })
   customerId!: string;

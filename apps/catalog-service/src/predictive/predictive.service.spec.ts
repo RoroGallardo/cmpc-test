@@ -159,7 +159,6 @@ describe('PredictiveService', () => {
           currentStock: 5,
           minStock: 10,
           maxStock: 100,
-          supplierPrice: 15,
           book: { id: 'book-1', title: 'Low Stock Book', price: 25 },
         },
       ];

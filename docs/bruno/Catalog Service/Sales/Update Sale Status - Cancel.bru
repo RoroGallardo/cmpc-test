@@ -1,0 +1,71 @@
+meta {
+  name: Update Sale Status - Cancel
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{catalog_service_url}}/sales/:id/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "status": "CANCELLED",
+    "notes": "Cliente solicitó cancelación"
+  }
+}
+
+docs {
+  Actualiza el estado de una venta a CANCELLED (cancelada).
+  
+  Parámetros de ruta:
+  - id: UUID de la venta
+  
+  Campos del body:
+  - status: "CANCELLED" (requerido)
+  - notes: Motivo de cancelación (opcional pero recomendado)
+  
+  Al cancelar una venta:
+  - Valida que NO esté ya CANCELLED
+  - Actualiza estado a CANCELLED
+  - Registra fecha de cancelación
+  - Emite evento Kafka 'sale.cancelled'
+  - Si la venta estaba COMPLETED:
+    * El analytics-worker revierte el inventario
+    * Crea movimientos de ajuste
+    * Revierte estadísticas
+  
+  Casos de uso:
+  - Cliente cancela orden antes de pagar
+  - Error en la venta
+  - Devolución completa
+  - Stock no disponible al momento de entrega
+  
+  Solo usuarios ADMIN pueden cancelar ventas.
+  
+  Requiere autenticación y rol ADMIN.
+  
+  Ejemplo de ID: copiar desde Get All Sales
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have status CANCELLED", function() {
+    expect(res.body).to.have.property('status');
+    expect(res.body.status).to.equal('CANCELLED');
+  });
+  
+  test("should have cancelledAt date", function() {
+    expect(res.body).to.have.property('cancelledAt');
+    expect(res.body.cancelledAt).to.not.be.null;
+  });
+}

@@ -17,7 +17,8 @@ export enum AuditEntity {
   BOOK = 'BOOK',
   AUTHOR = 'AUTHOR',
   PUBLISHER = 'PUBLISHER',
-  GENRE = 'GENRE'
+  GENRE = 'GENRE',
+  SALE = 'SALE'
 }
 
 @Entity('audit_logs')

@@ -82,7 +82,7 @@ export class AuditInterceptor implements NestInterceptor {
                 action,
                 oldValues: action === AuditAction.UPDATE ? oldValues : null,
                 newValues: data,
-                changes,
+                changes: changes as any,
                 ipAddress: ip || headers['x-forwarded-for'] || headers['x-real-ip'],
                 userAgent: headers['user-agent'],
                 endpoint: url,

@@ -151,7 +151,7 @@ export class PredictiveService {
             recommendedQuantity: prediction.recommendedRestock,
             urgency,
             estimatedDaysUntilStockout: daysUntilStockout,
-            estimatedCost: prediction.recommendedRestock * Number(inv.supplierPrice || inv.book.price),
+            estimatedCost: prediction.recommendedRestock * Number(inv.book.price),
           });
         }
       } catch (error) {

@@ -53,26 +53,6 @@ export class BookAnalytics {
   @Column({ type: 'int', default: 0, name: 'days_to_sell' })
   daysToSell!: number; // Días promedio para vender el stock actual
 
-  // Engagement
-  @Column({ type: 'int', default: 0, name: 'total_views' })
-  totalViews!: number;
-
-  @Column({ type: 'int', default: 0, name: 'views_last_7_days' })
-  viewsLast7Days!: number;
-
-  @Column({ type: 'int', default: 0, name: 'views_last_30_days' })
-  viewsLast30Days!: number;
-
-  @Column('decimal', { precision: 5, scale: 2, default: 0, name: 'conversion_rate' })
-  conversionRate!: number; // (ventas / vistas) * 100
-
-  // Devoluciones
-  @Column({ type: 'int', default: 0, name: 'total_returns' })
-  totalReturns!: number;
-
-  @Column('decimal', { precision: 5, scale: 2, default: 0, name: 'return_rate' })
-  returnRate!: number; // (devoluciones / ventas) * 100
-
   // Predicciones
   @Column({ type: 'int', nullable: true, name: 'predicted_demand_7_days' })
   predictedDemand7Days!: number;

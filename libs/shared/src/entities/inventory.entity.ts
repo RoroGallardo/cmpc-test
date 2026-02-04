@@ -37,34 +37,8 @@ export class Inventory {
   @Column({ type: 'int', default: 100, name: 'max_stock' })
   maxStock!: number;
 
-  // Stock reservado (para órdenes en proceso)
-  @Column({ type: 'int', default: 0, name: 'reserved_stock' })
-  reservedStock!: number;
-
-  // Stock disponible = current_stock - reserved_stock
-  @Column({ type: 'int', default: 0, name: 'available_stock' })
-  availableStock!: number;
-
-  // Ubicación física
-  @Column({ nullable: true })
-  location!: string;
-
   @Column({ nullable: true })
   warehouse!: string;
-
-  // Último reabastecimiento
-  @Column({ nullable: true, name: 'last_restock_date' })
-  lastRestockDate!: Date;
-
-  @Column({ type: 'int', default: 0, name: 'last_restock_quantity' })
-  lastRestockQuantity!: number;
-
-  // Proveedor preferido
-  @Column({ nullable: true, name: 'preferred_supplier' })
-  preferredSupplier!: string;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true, name: 'supplier_price' })
-  supplierPrice!: number;
 
   @CreateDateColumn()
   createdAt!: Date;

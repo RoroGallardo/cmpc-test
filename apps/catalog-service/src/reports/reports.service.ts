@@ -101,6 +101,13 @@ export interface StockRotationReport {
     currentStock: number;
     lastSaleDate: Date | null;
   }>;
+  deadStock: Array<{
+    bookId: string;
+    title: string;
+    currentStock: number;
+    lastSaleDate: Date | null;
+    daysSinceLastSale: number;
+  }>;
   summary: {
     averageRotationRate: number;
     fastMovingCount: number;
@@ -390,22 +397,31 @@ export class ReportsService {
       .sort((a, b) => a.rotationRate - b.rotationRate)
       .slice(0, 20);
 
-    const deadStock = booksWithMetrics.filter(b => 
+    const deadStockBooks = booksWithMetrics.filter(b => 
       b.currentStock > 0 && 
       (!b.lastSaleDate || 
         (new Date().getTime() - new Date(b.lastSaleDate).getTime()) > 180 * 24 * 60 * 60 * 1000)
-    ).length;
+    ).map(b => ({
+      bookId: b.bookId,
+      title: b.title,
+      currentStock: b.currentStock,
+      lastSaleDate: b.lastSaleDate,
+      daysSinceLastSale: b.lastSaleDate 
+        ? Math.floor((new Date().getTime() - new Date(b.lastSaleDate).getTime()) / (24 * 60 * 60 * 1000))
+        : 999,
+    })).sort((a, b) => b.daysSinceLastSale - a.daysSinceLastSale);
 
     const avgRotation = booksWithMetrics.reduce((sum, b) => sum + b.rotationRate, 0) / booksWithMetrics.length;
 
     return {
       fastMoving,
       slowMoving,
+      deadStock: deadStockBooks,
       summary: {
         averageRotationRate: avgRotation,
         fastMovingCount: fastMoving.length,
         slowMovingCount: slowMoving.length,
-        deadStockCount: deadStock,
+        deadStockCount: deadStockBooks.length,
       },
     };
   }

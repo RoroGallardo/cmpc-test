@@ -32,6 +32,9 @@ export * from './dtos/genres/create.dto';
 export * from './dtos/genres/update.dto';
 export * from './dtos/auth/login.dto';
 export * from './dtos/auth/register.dto';
+export * from './dtos/sales/create-sale.dto';
+export { UpdateSaleStatusDto } from './dtos/sales/update-sale-status.dto';
+export * from './dtos/sales/filter-sale.dto';
 
 // ============= AUTH =============
 export * from './auth/jwt-auth.guard';
@@ -47,4 +50,7 @@ export * from './config/winston.config';
 
 // ============= DATABASE =============
 export * from './database/database.module';
+
+// ============= KAFKA =============
+export * from './kafka';
  

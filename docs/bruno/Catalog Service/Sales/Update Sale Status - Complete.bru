@@ -1,0 +1,73 @@
+meta {
+  name: Update Sale Status - Complete
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{catalog_service_url}}/sales/:id/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "status": "COMPLETED",
+    "paymentMethod": "CREDIT_CARD",
+    "paymentReference": "REF-123456"
+  }
+}
+
+docs {
+  Actualiza el estado de una venta a COMPLETED (completada).
+  
+  Parámetros de ruta:
+  - id: UUID de la venta
+  
+  Campos del body:
+  - status: "COMPLETED" (requerido)
+  - paymentMethod: Método de pago (requerido para COMPLETED)
+    Valores: CASH, CREDIT_CARD, DEBIT_CARD, TRANSFER, OTHER
+  - paymentReference: Referencia del pago (opcional)
+  
+  Al completar una venta:
+  - Valida que esté en estado PENDING
+  - Registra método de pago y referencia
+  - Actualiza fecha de completado
+  - Emite evento Kafka 'sale.completed'
+  - El analytics-worker procesa el evento:
+    * Actualiza estadísticas de ventas
+    * Reduce inventario
+    * Crea movimientos de stock
+  
+  Solo usuarios ADMIN pueden actualizar estados.
+  
+  Requiere autenticación y rol ADMIN.
+  
+  Ejemplo de ID: copiar desde Get All Sales
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have status COMPLETED", function() {
+    expect(res.body).to.have.property('status');
+    expect(res.body.status).to.equal('COMPLETED');
+  });
+  
+  test("should have payment info", function() {
+    expect(res.body).to.have.property('paymentMethod');
+    expect(res.body.paymentMethod).to.be.oneOf(['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'TRANSFER', 'OTHER']);
+  });
+  
+  test("should have completedAt date", function() {
+    expect(res.body).to.have.property('completedAt');
+    expect(res.body.completedAt).to.not.be.null;
+  });
+}

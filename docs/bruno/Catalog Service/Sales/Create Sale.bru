@@ -1,0 +1,90 @@
+meta {
+  name: Create Sale
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{catalog_service_url}}/sales
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "customerName": "Juan Pérez",
+    "customerEmail": "juan@example.com",
+    "items": [
+      {
+        "bookId": "uuid-book-1",
+        "quantity": 2,
+        "discount": 0
+      },
+      {
+        "bookId": "uuid-book-2",
+        "quantity": 1,
+        "discount": 5
+      }
+    ],
+    "discount": 10,
+    "notes": "Cliente frecuente"
+  }
+}
+
+docs {
+  Crea una nueva venta en el sistema.
+  
+  El endpoint:
+  - Valida stock disponible de cada libro
+  - Calcula subtotales, descuentos e impuestos
+  - Genera número de venta único (SALE-YYYY-NNNNN)
+  - Emite evento Kafka 'sale.created'
+  - Crea la venta en estado PENDING
+  
+  Campos requeridos:
+  - items: Array con al menos 1 item
+  - items[].bookId: ID del libro
+  - items[].quantity: Cantidad (> 0)
+  
+  Campos opcionales:
+  - customerName: Nombre del cliente
+  - customerEmail: Email del cliente
+  - items[].discount: Descuento por item (%)
+  - discount: Descuento global (%)
+  - notes: Notas adicionales
+  
+  Cálculos:
+  - Subtotal = suma de (precio * cantidad) por item
+  - Descuento = aplicado sobre subtotal
+  - Tax = 19% sobre (subtotal - descuento)
+  - Total = subtotal - descuento + tax
+  
+  Requiere autenticación y rol USER o ADMIN.
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should have status PENDING", function() {
+    expect(res.body).to.have.property('status');
+    expect(res.body.status).to.equal('PENDING');
+  });
+  
+  test("should have calculated totals", function() {
+    expect(res.body).to.have.property('subtotal');
+    expect(res.body).to.have.property('total');
+    expect(res.body).to.have.property('tax');
+  });
+  
+  test("should have items array", function() {
+    expect(res.body).to.have.property('items');
+    expect(res.body.items).to.be.an('array');
+    expect(res.body.items.length).to.be.greaterThan(0);
+  });
+}

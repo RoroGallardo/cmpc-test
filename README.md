@@ -31,7 +31,8 @@ npm run test:watch
 cmpc-test/
 ├── apps/
 │   ├── auth-service/          # Microservicio de autenticación y usuarios
-│   └── catalog-service/       # Microservicio de catálogo (libros, autores, etc.)
+│   ├── catalog-service/       # Microservicio de catálogo (libros, ventas, analytics)
+│   └── analytics-worker/      # Worker para procesamiento asíncrono de analytics
 └── libs/
     └── shared/                # Código compartido (entidades, DTOs, interfaces)
 ```
@@ -46,19 +47,58 @@ Gestiona la autenticación y administración de usuarios:
 - API de usuarios
 
 ### 📚 Catalog Service (Puerto 3002)
-Gestiona el catálogo de la biblioteca:
-- CRUD de libros con filtros
-- CRUD de autores
-- CRUD de géneros
-- CRUD de editoriales
-- Relaciones entre entidades
+Gestiona el catálogo, ventas y analytics de la biblioteca:
+- **Catálogo:**
+  - CRUD de libros con filtros
+  - CRUD de autores
+  - CRUD de géneros
+  - CRUD de editoriales
+  - Relaciones entre entidades
+- **Ventas:**
+  - Sistema completo de gestión de ventas
+  - Integración con inventario
+  - Publicación de eventos a Kafka/Redpanda
+- **Analytics en Tiempo Real:**
+  - Dashboard con métricas actualizadas
+  - Análisis de ventas por período
+  - Métricas de inventario y rotación
+- **Análisis Predictivo:**
+  - Predicción de demanda con IA
+  - Recomendaciones de reabastecimiento
+  - Análisis de tendencias
+- **Reportes Avanzados:**
+  - Análisis ABC (Pareto)
+  - Rentabilidad por categoría
+  - Estacionalidad de ventas
+  - Rotación de stock
+  - Trazabilidad de cambios (Audit Trail)
+- **Sistema de Alertas:**
+  - Alertas automáticas de stock bajo
+  - Detección de alta demanda
+  - Identificación de baja rotación
+  - Notificaciones de reabastecimiento
 - Validación de tokens JWT del auth-service
+
+### ⚙️ Analytics Worker (Procesamiento Asíncrono)
+Worker que consume eventos de Kafka para procesamiento en background:
+- Actualización automática de analytics de libros
+- Sincronización de inventario post-venta
+- Generación de predicciones de demanda
+- Creación de movimientos de stock
+- Cálculo de métricas de rotación
 
 ### 📦 Shared Library
 Biblioteca compartida que contiene:
-- Entidades de TypeORM (User, Book, Author, Genre, Publisher)
-- DTOs de validación (CreateDto, UpdateDto, FilterDto)
-- Interfaces de TypeScript
+- **Entidades de TypeORM:**
+  - Catálogo: User, Book, Author, Genre, Publisher
+  - Ventas: Sale, SaleItem
+  - Inventario: Inventory, StockMovement, InventorySnapshot
+  - Analytics: BookAnalytics, Alert
+  - Auditoría: AuditLog
+- **DTOs de validación:** CreateDto, UpdateDto, FilterDto
+- **Interfaces TypeScript** para todos los módulos
+- **Interceptores:** AuditInterceptor para trazabilidad
+- **Configuración compartida:** Winston logger, JWT strategy
 - Código reutilizable entre microservicios y frontend
 
 ## Instalación
@@ -120,24 +160,55 @@ Crear la base de datos:
 CREATE DATABASE cmpc_db;
 ```
 
-Las tablas de ambos servicios coexisten en el mismo schema:
+Las tablas de los servicios coexisten en el mismo schema:
 - **Auth Service**: `users`
-- **Catalog Service**: `books`, `authors`, `genres`, `publishers`
+- **Catalog Service**: 
+  - Catálogo: `books`, `authors`, `genres`, `publishers`
+  - Ventas: `sales`, `sale_items`
+  - Inventario: `inventory`, `stock_movements`, `inventory_snapshots`
+  - Analytics: `book_analytics`, `alerts`
+  - Auditoría: `audit_logs`
+
+## Infraestructura Kafka/Redpanda
+
+El sistema usa **Redpanda** (API compatible con Kafka) para procesamiento asíncrono:
+
+```bash
+# Iniciar Redpanda con Docker Compose
+docker-compose up -d
+
+# Verificar que Redpanda esté corriendo
+docker-compose ps
+
+# Ver logs
+docker-compose logs -f redpanda
+```
+
+**Topics creados automáticamente:**
+- `sale.created` - Eventos de venta creada
+- `sale.completed` - Eventos de venta completada
+- `sale.cancelled` - Eventos de venta cancelada
 
 ## Ejecución
 
 ### Desarrollo
 
 ```bash
-# Ejecutar auth-service
+# 1. Iniciar Redpanda (Kafka)
+docker-compose up -d
+
+# 2. Ejecutar auth-service
 npm run dev:auth
 # o
 nx serve auth-service
 
-# Ejecutar catalog-service
+# 3. Ejecutar catalog-service
 npm run dev:catalog
 # o
 nx serve catalog-service
+
+# 4. Ejecutar analytics-worker (opcional, para procesamiento async)
+nx serve analytics-worker
 
 # Ver el grafo de dependencias
 npm run graph
@@ -155,18 +226,50 @@ npm run build:all
 # Build individual
 npm run build:auth
 npm run build:catalog
+npm run build:analytics-worker
 
 # Start
 node dist/apps/auth-service/main.js
 node dist/apps/catalog-service/main.js
+node dist/apps/analytics-worker/main.js
 ```
 
 ## Documentación API
 
 Cada microservicio tiene su propia documentación Swagger:
 
-- Auth Service: http://localhost:3001/api/docs
-- Catalog Service: http://localhost:3002/api/docs
+- **Auth Service:** http://localhost:3001/api/docs
+- **Catalog Service:** http://localhost:3002/api/docs
+  - Endpoints de Catálogo (Books, Authors, Genres, Publishers)
+  - Endpoints de Ventas (Sales)
+  - **Endpoints de Analytics:**
+    - `/analytics/dashboard` - Dashboard en tiempo real
+    - `/analytics/sales` - Análisis de ventas
+    - `/analytics/inventory` - Métricas de inventario
+  - **Endpoints Predictivos:**
+    - `/predictive/demand/:bookId` - Predicción de demanda
+    - `/predictive/demand` - Predicciones para todos los libros
+    - `/predictive/restock-recommendations` - Recomendaciones de reabastecimiento
+  - **Endpoints de Reportes:**
+    - `/reports/abc-analysis` - Análisis ABC (Pareto)
+    - `/reports/profitability` - Reporte de rentabilidad
+    - `/reports/seasonality` - Análisis de estacionalidad
+    - `/reports/stock-rotation` - Rotación de inventario
+    - `/reports/audit-trail` - Trazabilidad de cambios
+  - **Endpoints de Alertas:**
+    - `/alerts` - Gestión de alertas del sistema
+    - `/alerts/check` - Verificación manual de alertas
+
+### Colección Bruno (API Client)
+
+Pruebas completas disponibles en `docs/bruno/`:
+- Autenticación
+- CRUD de Catálogo
+- Ventas
+- Analytics y Métricas
+- Análisis Predictivo
+- Reportes Avanzados
+- Sistema de Alertas
 
 ## Flujo de Autenticación
 
@@ -261,6 +364,18 @@ npm test                   # Ejecutar tests
 libs/shared/
 ├── src/
 │   ├── entities/          # Entidades TypeORM
+│   │   ├── user.entity.ts
+│   │   ├── book.entity.ts
+│   │   ├── author.entity.ts
+│   │   ├── genre.entity.ts
+│   │   ├── publisher.entity.ts
+│   │   ├── sale.entity.ts
+│   │   ├── inventory.entity.ts
+│   │   ├── stock-movement.entity.ts
+│   │   ├── book-analytics.entity.ts
+│   │   ├── alert.entity.ts
+│   │   ├── audit-log.entity.ts
+│   │   └── inventory-snapshot.entity.ts
 │   ├── interfaces/        # Interfaces TypeScript
 │   ├── dtos/              # DTOs de validación
 │   │   ├── auth/          # Login, Register
@@ -268,8 +383,51 @@ libs/shared/
 │   │   ├── authors/       # Create, Update
 │   │   ├── genres/        # Create, Update
 │   │   └── publishers/    # Create, Update
+│   ├── interceptors/      # Interceptores NestJS
+│   │   └── audit.interceptor.ts
+│   ├── auth/              # Autenticación compartida
+│   ├── config/            # Configuraciones
+│   │   └── winston.config.ts
 │   └── index.ts           # Exports centralizados
 ```
+
+## 🎯 Características Principales
+
+### Sistema de Ventas con Kafka
+- Procesamiento asíncrono de ventas mediante eventos
+- Actualización automática de inventario
+- Worker dedicado para analytics (analytics-worker)
+- Arquitectura desacoplada y escalable
+
+### Analytics Avanzados
+- **Dashboard en Tiempo Real:** Métricas actualizadas de ventas e inventario
+- **Análisis de Ventas:** Por día, categoría, autor, editorial
+- **Métricas de Inventario:** Valor total, rotación, stock crítico
+
+### Análisis Predictivo con IA
+- **Predicción de Demanda:** Algoritmo de media móvil exponencial
+- **Recomendaciones Inteligentes:** Sugerencias de reabastecimiento
+- **Análisis de Tendencias:** Detección de patrones de venta
+
+### Reportes de Negocio
+- **Análisis ABC (Pareto):** Clasificación de productos por rentabilidad
+- **Rentabilidad:** Análisis de márgenes por categoría/autor/editorial
+- **Estacionalidad:** Patrones de venta por mes y día de semana
+- **Rotación de Stock:** Identificación de productos de rápido/lento movimiento
+- **Audit Trail:** Trazabilidad completa de cambios
+
+### Sistema de Alertas Automáticas
+- Alertas de stock bajo y sin stock
+- Detección de alta demanda
+- Identificación de baja rotación
+- Recomendaciones de reabastecimiento
+- Ejecución automática mediante cron jobs
+
+### Trazabilidad Completa
+- Registro automático de todos los cambios
+- Valores anteriores y nuevos
+- Usuario, IP, timestamp
+- Auditoría de CRUD completo
 
 ## Próximos Pasos
 
@@ -285,9 +443,29 @@ libs/shared/
 
 ## Notas Importantes
 
+### Seguridad
 - **Criptografía Asimétrica**: Auth-service firma tokens con clave privada, otros servicios solo validan con clave pública
-- **Seguridad**: Solo auth-service puede crear tokens, otros servicios solo pueden verificarlos
-- **Base de datos compartida**: Ambos servicios usan la misma base de datos PostgreSQL
-- Los microservicios son independientes y pueden escalarse por separado
+- **Auditoría Completa**: Todos los cambios se registran automáticamente con AuditInterceptor
+- Solo auth-service puede crear tokens, otros servicios solo pueden verificarlos
+
+### Arquitectura
+- **Base de datos compartida**: Todos los servicios usan la misma base de datos PostgreSQL
+- **Event-Driven**: Procesamiento asíncrono mediante Kafka/Redpanda
+- **Microservicios independientes**: Pueden escalarse por separado
+- **Worker dedicado**: analytics-worker procesa eventos en background sin bloquear requests
+
+### Funcionalidades Avanzadas
+- **Analytics en Tiempo Real**: Actualización automática mediante worker de Kafka
+- **Predicción de Demanda**: IA para optimizar inventario
+- **Sistema de Alertas**: Cron jobs ejecutan verificaciones cada hora
+- **Reportes de Negocio**: Análisis ABC, rentabilidad, estacionalidad
+
+### Código Compartido
 - La librería `@cmpc-test/shared` puede ser usada tanto en backend como en frontend
+- Incluye entidades, DTOs, interfaces, guards, interceptores y configuración
 - Todas las configuraciones de entorno están centralizadas en `.env` en la raíz
+
+### Documentación
+- **Swagger UI**: Disponible en ambos servicios
+- **Bruno Collection**: Tests completos en `docs/bruno/`
+- **Documentación detallada**: Ver `docs/` para guías específicas

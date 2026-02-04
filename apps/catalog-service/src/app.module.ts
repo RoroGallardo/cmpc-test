@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { 
   Author, 
   Book, 
@@ -26,8 +27,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { PredictiveModule } from './predictive/predictive.module';
 import { ReportsModule } from './reports/reports.module';
 import { AlertsModule } from './alerts/alerts.module';
+import { SalesModule } from './sales/sales.module';
 import { CatalogSeeder } from './database/seeds/catalog.seeder';
 import { DatabaseController } from './database/database.controller';
+import { AuditInterceptor } from './interceptors/audit.interceptor';
 
 @Module({
   imports: [
@@ -74,9 +77,16 @@ import { DatabaseController } from './database/database.controller';
     AnalyticsModule,
     PredictiveModule,
     ReportsModule,
+    SalesModule,
     AlertsModule,
   ],
   controllers: [DatabaseController],
-  providers: [CatalogSeeder],
+  providers: [
+    CatalogSeeder,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
+    },
+  ],
 })
 export class AppModule {}

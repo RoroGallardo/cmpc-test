@@ -1,0 +1,77 @@
+meta {
+  name: Get All Sales
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{catalog_service_url}}/sales?page=1&limit=10&status=COMPLETED&startDate=2026-01-01&endDate=2026-02-03
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 10
+  status: COMPLETED
+  startDate: 2026-01-01
+  endDate: 2026-02-03
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene lista de ventas con filtros y paginación.
+  
+  Parámetros de query opcionales:
+  - page: Número de página (default: 1)
+  - limit: Items por página (default: 10)
+  - status: Filtrar por estado (PENDING, COMPLETED, CANCELLED)
+  - startDate: Fecha inicio (YYYY-MM-DD)
+  - endDate: Fecha fin (YYYY-MM-DD)
+  - customerName: Filtrar por nombre de cliente
+  
+  Estados de venta:
+  - PENDING: Venta creada pero no completada
+  - COMPLETED: Venta completada y pagada
+  - CANCELLED: Venta cancelada
+  
+  La respuesta incluye:
+  - data: Array de ventas
+  - meta: Información de paginación (total, page, limit, totalPages)
+  
+  Solo usuarios con rol ADMIN pueden ver todas las ventas.
+  Usuarios regulares solo ven sus propias ventas.
+  
+  Requiere autenticación y rol ADMIN.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have data array", function() {
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.be.an('array');
+  });
+  
+  test("should have meta pagination", function() {
+    expect(res.body).to.have.property('meta');
+    expect(res.body.meta).to.have.property('total');
+    expect(res.body.meta).to.have.property('page');
+    expect(res.body.meta).to.have.property('limit');
+    expect(res.body.meta).to.have.property('totalPages');
+  });
+  
+  test("each sale should have required fields", function() {
+    if (res.body.data.length > 0) {
+      expect(res.body.data[0]).to.have.property('id');
+
+      expect(res.body.data[0]).to.have.property('status');
+      expect(res.body.data[0]).to.have.property('total');
+    }
+  });
+}
