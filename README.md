@@ -31,7 +31,8 @@ npm run test:watch
 cmpc-test/
 ├── apps/
 │   ├── auth-service/          # Microservicio de autenticación y usuarios
-│   ├── catalog-service/       # Microservicio de catálogo (libros, ventas, analytics)
+│   ├── catalog-service/       # Microservicio de catálogo (libros, ventas)
+│   ├── analytics-service/     # Microservicio de analytics, predicciones y reportes
 │   └── analytics-worker/      # Worker para procesamiento asíncrono de analytics
 └── libs/
     └── shared/                # Código compartido (entidades, DTOs, interfaces)
@@ -47,7 +48,7 @@ Gestiona la autenticación y administración de usuarios:
 - API de usuarios
 
 ### 📚 Catalog Service (Puerto 3002)
-Gestiona el catálogo, ventas y analytics de la biblioteca:
+Gestiona el catálogo y ventas de la biblioteca:
 - **Catálogo:**
   - CRUD de libros con filtros
   - CRUD de autores
@@ -58,6 +59,10 @@ Gestiona el catálogo, ventas y analytics de la biblioteca:
   - Sistema completo de gestión de ventas
   - Integración con inventario
   - Publicación de eventos a Kafka/Redpanda
+- Validación de tokens JWT del auth-service
+
+### 📊 Analytics Service (Puerto 3003)
+Servicio dedicado a analytics, predicciones, reportes y alertas:
 - **Analytics en Tiempo Real:**
   - Dashboard con métricas actualizadas
   - Análisis de ventas por período
@@ -73,11 +78,10 @@ Gestiona el catálogo, ventas y analytics de la biblioteca:
   - Rotación de stock
   - Trazabilidad de cambios (Audit Trail)
 - **Sistema de Alertas:**
-  - Alertas automáticas de stock bajo
+  - Alertas automáticas de stock bajo (cron jobs)
   - Detección de alta demanda
   - Identificación de baja rotación
   - Notificaciones de reabastecimiento
-- Validación de tokens JWT del auth-service
 
 ### ⚙️ Analytics Worker (Procesamiento Asíncrono)
 Worker que consume eventos de Kafka para procesamiento en background:
@@ -207,7 +211,10 @@ npm run dev:catalog
 # o
 nx serve catalog-service
 
-# 4. Ejecutar analytics-worker (opcional, para procesamiento async)
+# 4. Ejecutar analytics-service
+nx serve analytics-service
+
+# 5. Ejecutar analytics-worker (opcional, para procesamiento async)
 nx serve analytics-worker
 
 # Ver el grafo de dependencias
@@ -226,11 +233,13 @@ npm run build:all
 # Build individual
 npm run build:auth
 npm run build:catalog
+npm run build:analytics
 npm run build:analytics-worker
 
 # Start
 node dist/apps/auth-service/main.js
 node dist/apps/catalog-service/main.js
+node dist/apps/analytics-service/main.js
 node dist/apps/analytics-worker/main.js
 ```
 
@@ -242,6 +251,7 @@ Cada microservicio tiene su propia documentación Swagger:
 - **Catalog Service:** http://localhost:3002/api/docs
   - Endpoints de Catálogo (Books, Authors, Genres, Publishers)
   - Endpoints de Ventas (Sales)
+- **Analytics Service:** http://localhost:3003/api/docs
   - **Endpoints de Analytics:**
     - `/analytics/dashboard` - Dashboard en tiempo real
     - `/analytics/sales` - Análisis de ventas

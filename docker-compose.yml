@@ -71,6 +71,28 @@ services:
     depends_on:
       - redpanda
 
+  # Analytics Service (nuevo)
+  analytics-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: analytics-service
+    container_name: cmpc-analytics-service
+    ports:
+      - '3003:3003'
+    environment:
+      - PORT=3003
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=cmpc_test
+    depends_on:
+      - postgres
+    networks:
+      - cmpc-network
+
 volumes:
   postgres_data:
   redpanda_data:
