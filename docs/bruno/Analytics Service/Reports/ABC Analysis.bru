@@ -1,0 +1,47 @@
+meta {
+  name: ABC Analysis
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{analytics_service_url}}/reports/abc-analysis?startDate=2024-01-01&endDate=2024-12-31
+  body: none
+  auth: bearer
+}
+
+params:query {
+  startDate: 2024-01-01
+  endDate: 2024-12-31
+  ~startDate: 
+  ~endDate: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Análisis ABC de inventario (Pareto).
+  
+  Clasifica los productos en:
+  - Categoría A: 80% de las ventas (20% de productos)
+  - Categoría B: 15% de las ventas
+  - Categoría C: 5% de las ventas
+  
+  Query Parameters:
+  - startDate (opcional): Fecha de inicio
+  - endDate (opcional): Fecha de fin
+  
+  Por defecto: últimos 90 días
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return ABC analysis", function() {
+    expect(res.body).to.be.an('object');
+  });
+}

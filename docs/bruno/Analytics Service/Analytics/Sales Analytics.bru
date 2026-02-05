@@ -1,0 +1,40 @@
+meta {
+  name: Sales Analytics
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{analytics_service_url}}/analytics/sales?startDate=2024-01-01&endDate=2024-12-31
+  body: none
+  auth: bearer
+}
+
+params:query {
+  startDate: 2024-01-01
+  endDate: 2024-12-31
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene análisis detallado de ventas por período.
+  
+  Query Parameters:
+  - startDate (opcional): Fecha de inicio en formato YYYY-MM-DD
+  - endDate (opcional): Fecha de fin en formato YYYY-MM-DD
+  
+  Si no se proporcionan, por defecto analiza los últimos 30 días.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return sales analytics", function() {
+    expect(res.body).to.be.an('object');
+  });
+}

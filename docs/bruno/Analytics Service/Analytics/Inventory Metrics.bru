@@ -1,0 +1,35 @@
+meta {
+  name: Inventory Metrics
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{analytics_service_url}}/analytics/inventory
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene métricas de inventario en tiempo real.
+  
+  Incluye información sobre:
+  - Stock total
+  - Productos con bajo stock
+  - Rotación de inventario
+  - Alertas activas
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return inventory metrics", function() {
+    expect(res.body).to.be.an('object');
+  });
+}

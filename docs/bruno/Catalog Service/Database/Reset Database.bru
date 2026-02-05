@@ -1,0 +1,49 @@
+meta {
+  name: Reset Database
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{catalog_service_url}}/database/reset
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Reinicia completamente la base de datos:
+  1. Limpia toda la base de datos (ver Clear Database)
+  2. Ejecuta el seed del catálogo completo (ver Seed Catalog)
+  
+  Resultado final:
+  - 8 géneros
+  - 8 autores
+  - 5 editoriales
+  - 15+ libros
+  - Inventarios inicializados
+  - Movimientos de stock de ejemplo
+  - Ventas de prueba
+  - Analytics pre-calculados
+  - Alertas iniciales
+  
+  ⚠️ ADVERTENCIA: Esta acción elimina todos los datos existentes.
+  
+  Útil para resetear el ambiente de desarrollo.
+  
+  Requiere autenticación de admin.
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return success message", function() {
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.include('reiniciada');
+  });
+}

@@ -1,0 +1,71 @@
+meta {
+  name: Get Sales Summary
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{catalog_service_url}}/sales/summary?startDate=2026-01-01&endDate=2026-02-03
+  body: none
+  auth: bearer
+}
+
+params:query {
+  startDate: 2026-01-01
+  endDate: 2026-02-03
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene un resumen estadístico de ventas en un periodo.
+  
+  Parámetros de query requeridos:
+  - startDate: Fecha de inicio (YYYY-MM-DD)
+  - endDate: Fecha de fin (YYYY-MM-DD)
+  
+  La respuesta incluye:
+  - totalSales: Número total de ventas
+  - totalRevenue: Ingresos totales ($)
+  - totalItems: Total de items vendidos
+  - averageOrderValue: Valor promedio por orden
+  - salesByDay: Ventas agrupadas por día
+  - salesByStatus: Ventas agrupadas por estado
+  - topSellingBooks: Libros más vendidos en el periodo
+  
+  Útil para:
+  - Dashboard de administración
+  - Reportes de ventas
+  - Análisis de rendimiento
+  - KPIs del negocio
+  
+  Requiere autenticación y rol ADMIN.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have totalSales", function() {
+    expect(res.body).to.have.property('totalSales');
+    expect(res.body.totalSales).to.be.a('number');
+  });
+  
+  test("should have totalRevenue", function() {
+    expect(res.body).to.have.property('totalRevenue');
+    expect(res.body.totalRevenue).to.be.a('number');
+  });
+  
+  test("should have averageOrderValue", function() {
+    expect(res.body).to.have.property('averageOrderValue');
+    expect(res.body.averageOrderValue).to.be.a('number');
+  });
+  
+  test("should have totalItems", function() {
+    expect(res.body).to.have.property('totalItems');
+    expect(res.body.totalItems).to.be.a('number');
+  });
+}

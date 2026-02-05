@@ -1,0 +1,66 @@
+meta {
+  name: Get Sale by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{catalog_service_url}}/sales/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene el detalle completo de una venta por su ID.
+  
+  Parámetros de ruta:
+  - id: UUID de la venta
+  
+  La respuesta incluye:
+  - Información básica de la venta
+  - Estado actual
+  - Cliente (nombre, email)
+  - Items vendidos con detalles de cada libro
+  - Totales calculados
+  - Información de pago (si está completada)
+  - Fechas de creación y actualización
+  - Información del vendedor
+  
+  Usuarios ADMIN pueden ver cualquier venta.
+  Usuarios regulares solo pueden ver sus propias ventas.
+  
+  Requiere autenticación.
+  
+  Ejemplo de ID: copiar desde Get All Sales
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should have sale details", function() {
+    expect(res.body).to.have.property('id');
+    expect(res.body).to.have.property('status');
+  });
+  
+  test("should have items", function() {
+    expect(res.body).to.have.property('items');
+    expect(res.body.items).to.be.an('array');
+  });
+  
+  test("should have totals", function() {
+    expect(res.body).to.have.property('subtotal');
+    expect(res.body).to.have.property('tax');
+    expect(res.body).to.have.property('total');
+  });
+  
+  test("should have dates", function() {
+    expect(res.body).to.have.property('createdAt');
+    expect(res.body).to.have.property('updatedAt');
+  });
+}

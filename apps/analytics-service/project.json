@@ -1,0 +1,45 @@
+{
+  "name": "@cmpc-test/analytics-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/analytics-service/src",
+  "projectType": "application",
+  "tags": ["type:app", "scope:analytics"],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "dependsOn": ["^build"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/analytics-service",
+        "main": "apps/analytics-service/src/main.ts",
+        "tsConfig": "apps/analytics-service/tsconfig.json",
+        "webpackConfig": "apps/analytics-service/webpack.config.js"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "@cmpc-test/analytics-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@cmpc-test/analytics-service:build:development"
+        },
+        "production": {
+          "buildTarget": "@cmpc-test/analytics-service:build:production"
+        }
+      }
+    }
+  }
+}

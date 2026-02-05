@@ -1,0 +1,52 @@
+{
+  "name": "analytics-worker",
+  "version": "0.0.1",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/analytics-worker/src",
+  "projectType": "application",
+  "tags": ["type:app", "scope:analytics"],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/analytics-worker",
+        "main": "apps/analytics-worker/src/main.ts",
+        "tsConfig": "apps/analytics-worker/tsconfig.json",
+        "webpackConfig": "apps/analytics-worker/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "analytics-worker:build",
+        "watch": false,
+        "inspect": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "analytics-worker:build:development",
+          "watch": false,
+          "inspect": false
+        },
+        "production": {
+          "buildTarget": "analytics-worker:build:production",
+          "watch": false,
+          "inspect": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Restock Recommendations
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{analytics_service_url}}/predictive/restock-recommendations
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Recomendaciones de reabastecimiento.
+  
+  Proporciona sugerencias inteligentes sobre:
+  - Cuándo reabastecer
+  - Cantidad recomendada
+  - Prioridad de reabastecimiento
+  - Costo estimado
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return recommendations", function() {
+    expect(res.body).to.be.an('array');
+  });
+}

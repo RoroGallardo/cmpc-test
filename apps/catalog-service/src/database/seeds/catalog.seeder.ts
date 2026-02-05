@@ -1,7 +1,19 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Author, Publisher, Genre, Book } from '@cmpc-test/shared';
+import { 
+  Author, 
+  Publisher, 
+  Genre, 
+  Book, 
+  Inventory, 
+  StockMovement, 
+  Sale, 
+  SaleItem, 
+  MovementType,
+  SaleStatus,
+  PaymentMethod,
+} from '@cmpc-test/shared';
 import {
   SEED_GENRES,
   SEED_AUTHORS,
@@ -22,6 +34,14 @@ export class CatalogSeeder implements OnModuleInit {
     private readonly genresRepository: Repository<Genre>,
     @InjectRepository(Book)
     private readonly booksRepository: Repository<Book>,
+    @InjectRepository(Inventory)
+    private readonly inventoryRepository: Repository<Inventory>,
+    @InjectRepository(StockMovement)
+    private readonly stockMovementRepository: Repository<StockMovement>,
+    @InjectRepository(Sale)
+    private readonly saleRepository: Repository<Sale>,
+    @InjectRepository(SaleItem)
+    private readonly saleItemRepository: Repository<SaleItem>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -73,6 +93,115 @@ export class CatalogSeeder implements OnModuleInit {
         })),
       );
 
+      // Crear inventarios para cada libro
+      const inventories = await queryRunner.manager.save(
+        Inventory,
+        books.map((book, index) => ({
+          bookId: book.id,
+          currentStock: 50 + index * 10, // Variación de stock
+          minStock: 10,
+          maxStock: 200,
+          warehouse: index % 2 === 0 ? 'Principal' : 'Secundario',
+        })),
+      );
+
+      // Crear movimientos de stock para cada libro
+      const stockMovements = [];
+      for (let i = 0; i < books.length; i++) {
+        const book = books[i];
+        const inventory = inventories[i];
+        
+        // Compra inicial
+        stockMovements.push({
+          bookId: book.id,
+          type: MovementType.PURCHASE,
+          quantity: inventory.currentStock + (i * 5),
+          stockBefore: 0,
+          stockAfter: inventory.currentStock + (i * 5),
+          unitPrice: book.price * 0.6, // 60% del precio de venta (costo)
+          notes: 'Compra inicial de inventario',
+          createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // Hace 60 días
+        });
+
+        // Algunas ventas
+        if (i % 2 === 0) {
+          const saleQuantity = Math.floor(Math.random() * 10) + 1;
+          stockMovements.push({
+            bookId: book.id,
+            type: MovementType.SALE,
+            quantity: -saleQuantity,
+            stockBefore: inventory.currentStock + (i * 5),
+            stockAfter: inventory.currentStock + (i * 5) - saleQuantity,
+            unitPrice: book.price,
+            notes: 'Venta regular',
+            createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+          });
+        }
+
+        // Algunos ajustes
+        if (i % 3 === 0) {
+          stockMovements.push({
+            bookId: book.id,
+            type: MovementType.ADJUSTMENT,
+            quantity: -2,
+            stockBefore: inventory.currentStock,
+            stockAfter: inventory.currentStock - 2,
+            notes: 'Ajuste por inventario físico',
+            createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+          });
+        }
+      }
+      await queryRunner.manager.save(StockMovement, stockMovements);
+
+      // Crear ventas de ejemplo
+      const sales = [];
+      const saleItems = [];
+      
+      for (let i = 0; i < 5; i++) {
+        const saleDate = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+        const itemCount = Math.floor(Math.random() * 3) + 1; // 1-3 items por venta
+        const selectedBooks = books.slice(i * 2, i * 2 + itemCount);
+        
+        let totalAmount = 0;
+        selectedBooks.forEach(book => {
+          totalAmount += book.price;
+        });
+
+        const sale = {
+          status: i === 0 ? SaleStatus.PENDING : SaleStatus.COMPLETED,
+          paymentMethod: i % 2 === 0 ? PaymentMethod.CREDIT_CARD : PaymentMethod.CASH,
+          subtotal: totalAmount,
+          tax: totalAmount * 0.19, // 19% IVA
+          discount: i === 0 ? 5 : 0,
+          total: totalAmount + (totalAmount * 0.19) - (i === 0 ? 5 : 0),
+          notes: `Venta de ejemplo ${i + 1}`,
+          createdAt: saleDate,
+        };
+        sales.push(sale);
+      }
+
+      const savedSales = await queryRunner.manager.save(Sale, sales);
+
+      // Crear items para cada venta
+      for (let i = 0; i < savedSales.length; i++) {
+        const sale = savedSales[i];
+        const itemCount = Math.floor(Math.random() * 3) + 1;
+        const selectedBooks = books.slice(i * 2, i * 2 + itemCount);
+
+        for (const book of selectedBooks) {
+          const quantity = Math.floor(Math.random() * 2) + 1;
+          saleItems.push({
+            saleId: sale.id,
+            bookId: book.id,
+            quantity,
+            unitPrice: book.price,
+            subtotal: book.price * quantity,
+            discount: 0,
+          });
+        }
+      }
+      await queryRunner.manager.save(SaleItem, saleItems);
+
       // Si todo fue bien, commit de la transacción
       await queryRunner.commitTransaction();
 
@@ -81,6 +210,9 @@ export class CatalogSeeder implements OnModuleInit {
       this.logger.log(`✍️ Creados ${authors.length} autores`);
       this.logger.log(`🏢 Creadas ${publishers.length} editoriales`);
       this.logger.log(`📖 Creados ${genres.length} géneros`);
+      this.logger.log(`📦 Creados ${inventories.length} inventarios`);
+      this.logger.log(`📊 Creados ${stockMovements.length} movimientos de stock`);
+      this.logger.log(`💰 Creadas ${savedSales.length} ventas con ${saleItems.length} items`);
     } catch (error) {
       // Si hay error, rollback de la transacción
       await queryRunner.rollbackTransaction();

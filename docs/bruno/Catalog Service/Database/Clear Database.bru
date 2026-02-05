@@ -1,0 +1,46 @@
+meta {
+  name: Clear Database
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{catalog_service_url}}/database/clear
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Limpia completamente la base de datos del catálogo:
+  - Elimina todas las alertas
+  - Elimina todos los analytics
+  - Elimina todos los items de venta
+  - Elimina todas las ventas
+  - Elimina todos los movimientos de stock
+  - Elimina todos los inventarios
+  - Elimina todos los snapshots de inventario
+  - Elimina todos los logs de auditoría
+  - Elimina todos los libros
+  - Elimina todos los autores
+  - Elimina todas las editoriales
+  - Elimina todos los géneros
+  
+  ⚠️ ADVERTENCIA: Esta acción es irreversible.
+  
+  Requiere autenticación de admin.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return success message", function() {
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.include('limpiada');
+  });
+}
