@@ -10,6 +10,7 @@ import {
   Index
 } from 'typeorm';
 import { Book } from './book.entity';
+import { User } from './user.entity';
 
 export enum SaleStatus {
   PENDING = 'PENDING',
@@ -28,22 +29,12 @@ export enum PaymentMethod {
 }
 
 @Entity('sales')
-@Index(['customerId'])
+@Index(['sellerId'])
 @Index(['status'])
 @Index(['createdAt'])
 export class Sale {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-
-  // Cliente
-  @Column({ name: 'customer_id', nullable: true })
-  customerId!: string;
-
-  @Column({ name: 'customer_name', nullable: true })
-  customerName!: string;
-
-  @Column({ name: 'customer_email', nullable: true })
-  customerEmail!: string;
 
   // Estado de la venta
   @Column({
@@ -80,12 +71,16 @@ export class Sale {
   @Column({ name: 'paid_at', nullable: true })
   paidAt!: Date;
 
-  // Vendedor
-  @Column({ name: 'seller_id', nullable: true })
-  sellerId!: string;
+  // Vendedor - Relación con User
+  @ManyToOne(() => User, { 
+    onDelete: 'SET NULL',
+    nullable: true 
+  })
+  @JoinColumn({ name: 'seller_id' })
+  seller!: User;
 
-  @Column({ name: 'seller_name', nullable: true })
-  sellerName!: string;
+  @Column({ name: 'seller_id', type: 'uuid', nullable: true })
+  sellerId!: string;
 
   // Relación con items de venta
   @OneToMany(() => SaleItem, item => item.sale, { 
@@ -137,12 +132,6 @@ export class SaleItem {
 
   @Column({ name: 'book_id' })
   bookId!: string;
-
-  @Column({ name: 'book_title' })
-  bookTitle!: string;
-
-  @Column({ name: 'book_isbn', nullable: true })
-  bookIsbn!: string;
 
   // Cantidad y precios
   @Column({ type: 'int' })

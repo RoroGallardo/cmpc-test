@@ -71,7 +71,6 @@ export class SalesService {
 
       saleItems.push({
         bookId: item.bookId,
-        bookTitle: book.title,
         quantity: item.quantity,
         unitPrice: book.price,
         discount: item.discount || 0,
@@ -85,9 +84,6 @@ export class SalesService {
 
     // Crear la venta
     const sale = this.saleRepo.create({
-      customerId: createSaleDto.customerId,
-      customerName: createSaleDto.customerName,
-      customerEmail: createSaleDto.customerEmail,
       status: SaleStatus.PENDING,
       subtotal,
       discount,
@@ -95,7 +91,6 @@ export class SalesService {
       total,
       notes: createSaleDto.notes,
       sellerId: createSaleDto.sellerId,
-      sellerName: createSaleDto.sellerName,
     });
 
     const savedSale = await this.saleRepo.save(sale);
@@ -137,11 +132,12 @@ export class SalesService {
    * Obtener todas las ventas con filtros
    */
   async findAll(filterDto: FilterSaleDto) {
-    const { status, customerId, startDate, endDate, page = 1, limit = 10 } = filterDto;
+    const { status, sellerId, startDate, endDate, page = 1, limit = 10 } = filterDto;
 
     const query = this.saleRepo
       .createQueryBuilder('sale')
       .leftJoinAndSelect('sale.items', 'items')
+      .leftJoinAndSelect('sale.seller', 'seller')
       .orderBy('sale.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
@@ -150,8 +146,8 @@ export class SalesService {
       query.andWhere('sale.status = :status', { status });
     }
 
-    if (customerId) {
-      query.andWhere('sale.customerId = :customerId', { customerId });
+    if (sellerId) {
+      query.andWhere('sale.sellerId = :sellerId', { sellerId });
     }
 
     if (startDate && endDate) {
@@ -180,7 +176,7 @@ export class SalesService {
   async findOne(id: string): Promise<Sale> {
     const sale = await this.saleRepo.findOne({
       where: { id },
-      relations: ['items'],
+      relations: ['items', 'seller'],
     });
 
     if (!sale) {

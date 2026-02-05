@@ -1,0 +1,37 @@
+meta {
+  name: Get Active Alerts
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{analytics_service_url}}/alerts?limit=50
+  body: none
+  auth: bearer
+}
+
+params:query {
+  limit: 50
+  ~limit: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene todas las alertas activas.
+  
+  Query Parameters:
+  - limit (opcional): Número máximo de alertas (default: 50)
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return array of alerts", function() {
+    expect(res.body).to.be.an('array');
+  });
+}

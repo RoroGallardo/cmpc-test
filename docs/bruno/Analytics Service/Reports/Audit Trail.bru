@@ -1,0 +1,38 @@
+meta {
+  name: Audit Trail
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{analytics_service_url}}/reports/audit-trail
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~startDate: 2024-01-01
+  ~endDate: 2024-12-31
+  ~entityId: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Trazabilidad completa de cambios.
+  
+  Query Parameters:
+  - startDate (opcional): Fecha de inicio
+  - endDate (opcional): Fecha de fin
+  - entityId (opcional): ID de entidad específica
+  
+  Por defecto: últimos 7 días
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

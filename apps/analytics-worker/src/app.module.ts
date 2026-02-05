@@ -12,6 +12,7 @@ import {
   Author,
   Publisher,
   Genre,
+  User,
   KafkaConsumerModule,
 } from '@cmpc-test/shared';
 import { SalesEventConsumer } from './consumers/sales-event.consumer';
@@ -35,6 +36,7 @@ import { InventoryService } from './services/inventory.service';
         Author,
         Publisher,
         Genre,
+        User,
       ],
     }),
     TypeOrmModule.forFeature([
@@ -47,6 +49,7 @@ import { InventoryService } from './services/inventory.service';
       Author,
       Publisher,
       Genre,
+      User,
     ]),
     KafkaConsumerModule.register({
       groupId: process.env.KAFKA_GROUP_ID || 'analytics-group',

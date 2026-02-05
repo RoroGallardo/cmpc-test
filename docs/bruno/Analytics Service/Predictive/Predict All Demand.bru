@@ -1,0 +1,34 @@
+meta {
+  name: Predict All Demand
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{analytics_service_url}}/predictive/demand
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Predicción de demanda para todos los libros.
+  
+  Genera predicciones masivas basadas en:
+  - Machine learning
+  - Histórico de ventas
+  - Patrones de comportamiento
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return array of predictions", function() {
+    expect(res.body).to.be.an('array');
+  });
+}

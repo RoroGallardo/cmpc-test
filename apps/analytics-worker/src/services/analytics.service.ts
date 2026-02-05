@@ -27,7 +27,7 @@ export class AnalyticsService {
 
       // Procesar cada item de la venta
       for (const item of sale.items) {
-        this.logger.log(`Procesando item: ${item.bookTitle} (${item.bookId})`);
+        this.logger.log(`Procesando item: ${item.bookId}`);
 
         let analytics = await this.analyticsRepo.findOne({
           where: { bookId: item.bookId },
@@ -110,7 +110,7 @@ export class AnalyticsService {
         await this.analyticsRepo.save(analytics);
 
         this.logger.log(
-          `✅ Analytics actualizado para libro ${item.bookTitle}: +${item.quantity} unidades (Total: ${analytics.totalUnitsSold}, Rotación: ${analytics.rotationRate.toFixed(2)})`
+          `✅ Analytics actualizado para libro ${item.bookId}: +${item.quantity} unidades (Total: ${analytics.totalUnitsSold}, Rotación: ${analytics.rotationRate.toFixed(2)})`
         );
       }
     } catch (error) {

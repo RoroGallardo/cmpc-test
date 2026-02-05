@@ -1,0 +1,38 @@
+meta {
+  name: Predict Demand for Book
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{analytics_service_url}}/predictive/demand/{{book_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Predicción de demanda para un libro específico.
+  
+  Utiliza análisis predictivo basado en:
+  - Histórico de ventas
+  - Tendencias estacionales
+  - Rotación de inventario
+  
+  Retorna predicciones para:
+  - Próximos 7 días
+  - Próximos 30 días
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return prediction data", function() {
+    expect(res.body).to.be.an('object');
+  });
+}

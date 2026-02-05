@@ -35,7 +35,7 @@ export class InventoryService {
         // Validar que hay stock suficiente
         if (stockAfter < 0) {
           this.logger.error(
-            `❌ Stock insuficiente para ${item.bookTitle}: ${stockBefore} disponible, ${item.quantity} solicitado`
+            `❌ Stock insuficiente para libro ${item.bookId}: ${stockBefore} disponible, ${item.quantity} solicitado`
           );
           continue;
         }
@@ -53,7 +53,7 @@ export class InventoryService {
           stockBefore,
           stockAfter,
           unitPrice: item.unitPrice,
-          notes: `Venta ${sale.id} - Cliente: ${sale.customerName || 'N/A'}`,
+          notes: `Venta ${sale.id}`,
           referenceId: sale.id,
           userId: sale.sellerId,
         });
@@ -61,7 +61,7 @@ export class InventoryService {
         await this.movementRepo.save(movement);
 
         this.logger.log(
-          `✅ Inventario actualizado para ${item.bookTitle}: ${stockBefore} → ${stockAfter} (-${item.quantity})`
+          `✅ Inventario actualizado para libro ${item.bookId}: ${stockBefore} → ${stockAfter} (-${item.quantity})`
         );
       }
     } catch (error) {
@@ -107,7 +107,7 @@ export class InventoryService {
         await this.movementRepo.save(movement);
 
         this.logger.log(
-          `✅ Inventario revertido para ${item.bookTitle}: ${stockBefore} → ${stockAfter} (+${item.quantity})`
+          `✅ Inventario revertido para libro ${item.bookId}: ${stockBefore} → ${stockAfter} (+${item.quantity})`
         );
       }
     } catch (error) {

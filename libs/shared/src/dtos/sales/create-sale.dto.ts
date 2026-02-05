@@ -34,33 +34,6 @@ export class CreateSaleItemDto {
 
 export class CreateSaleDto {
   @ApiProperty({
-    description: 'Nombre del cliente (opcional)',
-    example: 'Juan Pérez',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  customerName?: string;
-
-  @ApiProperty({
-    description: 'Email del cliente (opcional)',
-    example: 'juan.perez@example.com',
-    required: false,
-  })
-  @IsEmail()
-  @IsOptional()
-  customerEmail?: string;
-
-  @ApiProperty({
-    description: 'ID del cliente (opcional)',
-    example: 'customer-123',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  customerId?: string;
-
-  @ApiProperty({
     description: 'Items de la venta',
     type: [CreateSaleItemDto],
     example: [
@@ -94,20 +67,11 @@ export class CreateSaleDto {
   notes?: string;
 
   @ApiProperty({
-    description: 'ID del vendedor (opcional)',
-    example: 'seller-123',
+    description: 'ID del vendedor (UUID del usuario autenticado)',
+    example: 'a1234567-89ab-cdef-0123-456789abcdef',
     required: false,
   })
-  @IsString()
+  @IsUUID()
   @IsOptional()
   sellerId?: string;
-
-  @ApiProperty({
-    description: 'Nombre del vendedor (opcional)',
-    example: 'María González',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  sellerName?: string;
 }

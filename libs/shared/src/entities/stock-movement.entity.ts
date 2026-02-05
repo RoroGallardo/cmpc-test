@@ -8,6 +8,7 @@ import {
   Index
 } from 'typeorm';
 import { Book } from './book.entity';
+import { User } from './user.entity';
 
 export enum MovementType {
   PURCHASE = 'PURCHASE',        // Compra a proveedor
@@ -58,12 +59,16 @@ export class StockMovement {
   @Column({ type: 'int', name: 'stock_after' })
   stockAfter!: number;
 
-  // Usuario que realizó el movimiento
-  @Column({ name: 'user_id', nullable: true })
-  userId!: string;
+  // Usuario que realizó el movimiento - Relación con User
+  @ManyToOne(() => User, { 
+    onDelete: 'SET NULL',
+    nullable: true 
+  })
+  @JoinColumn({ name: 'user_id' })
+  user!: User;
 
-  @Column({ name: 'user_email', nullable: true })
-  userEmail!: string;
+  @Column({ name: 'user_id', type: 'uuid', nullable: true })
+  userId!: string;
 
   // Referencia a transacción/orden relacionada
   @Column({ name: 'reference_id', nullable: true })

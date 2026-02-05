@@ -1,0 +1,31 @@
+meta {
+  name: Stock Rotation Report
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{analytics_service_url}}/reports/stock-rotation
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Reporte de rotación de inventario.
+  
+  Muestra:
+  - Tasa de rotación por producto
+  - Días promedio en inventario
+  - Productos de alta/baja rotación
+  - Recomendaciones de stock
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

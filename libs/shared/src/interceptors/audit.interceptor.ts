@@ -76,7 +76,6 @@ export class AuditInterceptor implements NestInterceptor {
 
               const auditLog = this.auditRepository.create({
                 userId: user?.id || user?.sub,
-                userEmail: user?.email,
                 entityType,
                 entityId,
                 action,

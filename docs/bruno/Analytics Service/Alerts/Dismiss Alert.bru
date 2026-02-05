@@ -1,0 +1,28 @@
+meta {
+  name: Dismiss Alert
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{analytics_service_url}}/alerts/{{alert_id}}/dismiss
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Descarta una alerta.
+  
+  Cambia el estado a DISMISSED e indica que
+  la alerta no requiere acción.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

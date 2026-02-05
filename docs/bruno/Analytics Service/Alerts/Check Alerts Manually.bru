@@ -1,0 +1,34 @@
+meta {
+  name: Check Alerts Manually
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{analytics_service_url}}/alerts/check
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Ejecuta verificación manual de alertas.
+  
+  Fuerza la ejecución del proceso de generación
+  de alertas sin esperar al scheduler automático.
+  
+  Útil para debugging o actualizaciones inmediatas.
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return success message", function() {
+    expect(res.body).to.have.property('message');
+  });
+}

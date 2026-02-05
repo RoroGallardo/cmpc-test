@@ -1,0 +1,42 @@
+meta {
+  name: Profitability Report
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{analytics_service_url}}/reports/profitability
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~startDate: 2024-01-01
+  ~endDate: 2024-12-31
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Reporte de rentabilidad por categoría.
+  
+  Muestra:
+  - Ingresos por categoría
+  - Costos por categoría
+  - Margen de ganancia
+  - ROI por categoría
+  
+  Query Parameters:
+  - startDate (opcional)
+  - endDate (opcional)
+  
+  Por defecto: últimos 30 días
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

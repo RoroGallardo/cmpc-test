@@ -1,0 +1,27 @@
+meta {
+  name: Dashboard Metrics
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{analytics_service_url}}/analytics/dashboard
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return dashboard metrics", function() {
+    expect(res.body).to.have.property('today');
+    expect(res.body).to.have.property('thisWeek');
+    expect(res.body).to.have.property('thisMonth');
+  });
+}

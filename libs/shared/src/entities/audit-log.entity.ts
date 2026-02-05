@@ -3,8 +3,11 @@ import {
   PrimaryGeneratedColumn, 
   Column, 
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
   Index
 } from 'typeorm';
+import { User } from './user.entity';
 
 export enum AuditAction {
   CREATE = 'CREATE',
@@ -30,12 +33,16 @@ export class AuditLog {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // Quién realizó el cambio
-  @Column({ name: 'user_id', nullable: true })
-  userId!: string;
+  // Quién realizó el cambio - Relación con User
+  @ManyToOne(() => User, { 
+    onDelete: 'SET NULL',
+    nullable: true 
+  })
+  @JoinColumn({ name: 'user_id' })
+  user!: User;
 
-  @Column({ name: 'user_email', nullable: true })
-  userEmail!: string;
+  @Column({ name: 'user_id', type: 'uuid', nullable: true })
+  userId!: string;
 
   // Qué se modificó
   @Column({

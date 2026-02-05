@@ -1,0 +1,35 @@
+meta {
+  name: Get Alerts by Severity
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{analytics_service_url}}/alerts/severity/CRITICAL
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Obtiene alertas por severidad.
+  
+  Severidades disponibles:
+  - LOW: Baja prioridad
+  - MEDIUM: Prioridad media
+  - HIGH: Alta prioridad
+  - CRITICAL: Crítico, requiere atención inmediata
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return array of alerts", function() {
+    expect(res.body).to.be.an('array');
+  });
+}

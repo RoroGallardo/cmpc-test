@@ -7,6 +7,7 @@ import {
   Book, 
   Genre, 
   Publisher, 
+  User,
   DatabaseModule,
   Inventory,
   StockMovement,
@@ -20,6 +21,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { PredictiveModule } from './predictive/predictive.module';
 import { ReportsModule } from './reports/reports.module';
 import { AlertsModule } from './alerts/alerts.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { AlertsModule } from './alerts/alerts.module';
         Book, 
         Genre, 
         Publisher,
+        User,
         Inventory,
         StockMovement,
         Sale,
@@ -48,6 +51,7 @@ import { AlertsModule } from './alerts/alerts.module';
       Book, 
       Genre, 
       Publisher,
+      User,
       Inventory,
       StockMovement,
       Sale,
@@ -56,6 +60,7 @@ import { AlertsModule } from './alerts/alerts.module';
       Alert,
       AuditLog
     ]),
+    AuthModule,
     AnalyticsModule,
     PredictiveModule,
     ReportsModule,

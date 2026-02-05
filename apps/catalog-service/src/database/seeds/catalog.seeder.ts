@@ -10,12 +10,7 @@ import {
   StockMovement, 
   Sale, 
   SaleItem, 
-  BookAnalytics,
-  Alert,
   MovementType,
-  AlertType,
-  AlertSeverity,
-  AlertStatus,
   SaleStatus,
   PaymentMethod,
 } from '@cmpc-test/shared';
@@ -47,10 +42,6 @@ export class CatalogSeeder implements OnModuleInit {
     private readonly saleRepository: Repository<Sale>,
     @InjectRepository(SaleItem)
     private readonly saleItemRepository: Repository<SaleItem>,
-    @InjectRepository(BookAnalytics)
-    private readonly bookAnalyticsRepository: Repository<BookAnalytics>,
-    @InjectRepository(Alert)
-    private readonly alertRepository: Repository<Alert>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -177,9 +168,6 @@ export class CatalogSeeder implements OnModuleInit {
         });
 
         const sale = {
-          customerId: `customer-${i + 1}`,
-          customerName: `Cliente ${i + 1}`,
-          customerEmail: `cliente${i + 1}@example.com`,
           status: i === 0 ? SaleStatus.PENDING : SaleStatus.COMPLETED,
           paymentMethod: i % 2 === 0 ? PaymentMethod.CREDIT_CARD : PaymentMethod.CASH,
           subtotal: totalAmount,
@@ -205,7 +193,6 @@ export class CatalogSeeder implements OnModuleInit {
           saleItems.push({
             saleId: sale.id,
             bookId: book.id,
-            bookTitle: book.title,
             quantity,
             unitPrice: book.price,
             subtotal: book.price * quantity,
@@ -214,79 +201,6 @@ export class CatalogSeeder implements OnModuleInit {
         }
       }
       await queryRunner.manager.save(SaleItem, saleItems);
-
-      // Crear analytics para cada libro
-      const analytics = await queryRunner.manager.save(
-        BookAnalytics,
-        books.map((book, index) => ({
-          bookId: book.id,
-          totalUnitsSold: Math.floor(Math.random() * 100) + 10,
-          totalRevenue: (Math.floor(Math.random() * 100) + 10) * book.price,
-          salesLast7Days: Math.floor(Math.random() * 10),
-          salesLast30Days: Math.floor(Math.random() * 30) + 5,
-          salesLast90Days: Math.floor(Math.random() * 90) + 15,
-          rotationRate: parseFloat((Math.random() * 2 + 0.5).toFixed(2)), // 0.5 - 2.5
-          daysToSell: Math.floor(Math.random() * 60) + 10,
-          predictedDemand7Days: Math.floor(Math.random() * 15) + 2,
-          predictedDemand30Days: Math.floor(Math.random() * 50) + 10,
-          recommendedRestockQuantity: index % 4 === 0 ? Math.floor(Math.random() * 30) + 20 : 0,
-          lastCalculatedAt: new Date(),
-        })),
-      );
-
-      // Crear algunas alertas
-      const alerts = [];
-      for (let i = 0; i < books.length; i++) {
-        const inventory = inventories[i];
-        
-        // Alerta de stock bajo para algunos libros
-        if (inventory.currentStock < inventory.minStock * 1.5) {
-          alerts.push({
-            bookId: books[i].id,
-            type: AlertType.LOW_STOCK,
-            severity: AlertSeverity.MEDIUM,
-            status: AlertStatus.ACTIVE,
-            message: `Stock bajo para "${books[i].title}". Stock actual: ${inventory.currentStock}, Stock mínimo: ${inventory.minStock}`,
-            metadata: {
-              currentStock: inventory.currentStock,
-              minStock: inventory.minStock,
-              suggestedOrder: inventory.maxStock - inventory.currentStock,
-            },
-          });
-        }
-
-        // Alerta de alta demanda para libros populares
-        if (i % 5 === 0) {
-          alerts.push({
-            bookId: books[i].id,
-            type: AlertType.HIGH_DEMAND,
-            severity: AlertSeverity.HIGH,
-            status: AlertStatus.ACTIVE,
-            message: `Alta demanda detectada para "${books[i].title}"`,
-            metadata: {
-              salesLast7Days: analytics[i].salesLast7Days,
-              predictedDemand: analytics[i].predictedDemand7Days,
-            },
-          });
-        }
-
-        // Alerta de reabastecimiento necesario
-        if (i % 7 === 0) {
-          alerts.push({
-            bookId: books[i].id,
-            type: AlertType.RESTOCK_NEEDED,
-            severity: AlertSeverity.CRITICAL,
-            status: AlertStatus.ACTIVE,
-            message: `Se requiere reabastecimiento urgente para "${books[i].title}"`,
-            metadata: {
-              currentStock: inventory.currentStock,
-              recommendedQuantity: analytics[i].recommendedRestockQuantity || 50,
-              daysUntilStockout: Math.floor(inventory.currentStock / (analytics[i].salesLast30Days / 30)),
-            },
-          });
-        }
-      }
-      await queryRunner.manager.save(Alert, alerts);
 
       // Si todo fue bien, commit de la transacción
       await queryRunner.commitTransaction();
@@ -299,8 +213,6 @@ export class CatalogSeeder implements OnModuleInit {
       this.logger.log(`📦 Creados ${inventories.length} inventarios`);
       this.logger.log(`📊 Creados ${stockMovements.length} movimientos de stock`);
       this.logger.log(`💰 Creadas ${savedSales.length} ventas con ${saleItems.length} items`);
-      this.logger.log(`📈 Creados ${analytics.length} registros de analytics`);
-      this.logger.log(`🚨 Creadas ${alerts.length} alertas`);
     } catch (error) {
       // Si hay error, rollback de la transacción
       await queryRunner.rollbackTransaction();

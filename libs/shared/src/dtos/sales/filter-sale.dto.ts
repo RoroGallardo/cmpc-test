@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsDateString } from 'class-validator';
+import { IsEnum, IsOptional, IsUUID, IsDateString } from 'class-validator';
 import { SaleStatus } from './update-sale-status.dto';
 
 export class FilterSaleDto {
@@ -13,13 +13,13 @@ export class FilterSaleDto {
   status?: SaleStatus;
 
   @ApiProperty({
-    description: 'ID del cliente',
-    example: 'customer-123',
+    description: 'ID del vendedor (UUID del usuario)',
+    example: 'a1234567-89ab-cdef-0123-456789abcdef',
     required: false,
   })
-  @IsString()
+  @IsUUID()
   @IsOptional()
-  customerId?: string;
+  sellerId?: string;
 
   @ApiProperty({
     description: 'Fecha de inicio (formato ISO)',

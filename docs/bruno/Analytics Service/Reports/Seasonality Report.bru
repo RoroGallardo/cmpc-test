@@ -1,0 +1,31 @@
+meta {
+  name: Seasonality Report
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{analytics_service_url}}/reports/seasonality
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  Análisis de estacionalidad de ventas.
+  
+  Identifica patrones de ventas por:
+  - Mes del año
+  - Día de la semana
+  - Temporadas
+  - Tendencias históricas
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}
