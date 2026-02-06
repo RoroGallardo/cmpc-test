@@ -5,9 +5,7 @@
 Monorepo con microservicios NestJS para gestión de biblioteca y autenticación.
 
 ## 🧪 Tests y Coverage
-
-- **Total de Tests**: 83 ✅
-- **Coverage**: 100% Statements | 92.92% Branches | 100% Functions | 100% Lines
+ 
 
 ```bash
 # Ejecutar todos los tests
@@ -526,13 +524,9 @@ libs/shared/
 - **Worker dedicado**: analytics-worker procesa eventos en background sin bloquear requests
 
 ### Funcionalidades Avanzadas
-- **Documentación Técnica Completa**: 60+ páginas con 50+ diagramas Mermaid
-  - Ver [docs/README_DOCS.md](docs/README_DOCS.md) para el índice completo
-  - Arquitectura, casos de uso, base de datos, secuencias, componentes
-- **Swagger UI**: Disponible en todos los servicios backend
-- **Bruno Collection**: Tests completos de API en `docs/bruno/`
-- **Diagramas Interactivos**: Todos los diagramas en formato Mermaid
-  - Compatibles con GitHub, VS Code, GitLab, Confluencehora
+- **Analytics en Tiempo Real**: Actualización automática mediante worker de Kafka
+- **Predicción de Demanda**: IA para optimizar inventario
+- **Sistema de Alertas**: Cron jobs ejecutan verificaciones cada hora
 - **Reportes de Negocio**: Análisis ABC, rentabilidad, estacionalidad
 
 ### Código Compartido
