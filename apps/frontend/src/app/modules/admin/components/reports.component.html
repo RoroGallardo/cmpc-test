@@ -1,0 +1,195 @@
+<div class="reports-container">
+  <h1>Reportes</h1>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <!-- Filtros -->
+  <div class="card">
+    <h2>Filtros</h2>
+    <form [formGroup]="filterForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="startDate">Fecha Inicio</label>
+          <input type="date" id="startDate" formControlName="startDate" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">Fecha Fin</label>
+          <input type="date" id="endDate" formControlName="endDate" class="form-control" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" (click)="generateSalesReport()" [disabled]="loading">
+          Generar Reporte de Ventas
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="generateInventoryReport()" [disabled]="loading">
+          Generar Reporte de Inventario
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Reporte de Ventas -->
+  <div class="card" *ngIf="salesReport">
+    <h2>Reporte de Ventas</h2>
+    <div class="report-summary">
+      <div class="summary-item">
+        <span class="label">Total Ventas:</span>
+        <span class="value">{{ salesReport.totalSales }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Ingresos Totales:</span>
+        <span class="value">${{ salesReport.totalRevenue | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Valor Promedio:</span>
+        <span class="value">${{ salesReport.averageOrderValue | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Ventas por día -->
+    <h3>Ventas por Día</h3>
+    <table class="table" *ngIf="salesReport.salesByDay?.length > 0">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cantidad Ventas</th>
+          <th>Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let detail of salesReport.salesByDay">
+          <td>{{ detail.date | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ detail.sales }}</td>
+          <td>${{ detail.revenue | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Ventas por categoría -->
+    <h3>Ventas por Categoría</h3>
+    <table class="table" *ngIf="salesReport.salesByCategory?.length > 0">
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Cantidad Ventas</th>
+          <th>Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of salesReport.salesByCategory">
+          <td>{{ category.category }}</td>
+          <td>{{ category.sales }}</td>
+          <td>${{ category.revenue | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Top productos -->
+    <h3>Top Productos</h3>
+    <table class="table" *ngIf="salesReport.topProducts?.length > 0">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Unidades Vendidas</th>
+          <th>Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of salesReport.topProducts">
+          <td>{{ product.title }}</td>
+          <td>{{ product.unitsSold }}</td>
+          <td>${{ product.revenue | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Reporte de Inventario -->
+  <div class="card" *ngIf="inventoryReport">
+    <h2>Reporte de Inventario</h2>
+    
+    <div class="report-summary">
+      <div class="summary-item">
+        <span class="label">Valor Total:</span>
+        <span class="value">${{ inventoryReport.totalValue | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Unidades Totales:</span>
+        <span class="value">{{ inventoryReport.totalUnits }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Tasa de Rotación Promedio:</span>
+        <span class="value">{{ inventoryReport.averageRotationRate | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Stock bajo -->
+    <h3>Libros con Stock Bajo</h3>
+    <table class="table" *ngIf="inventoryReport.lowStockItems?.length > 0">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Stock Actual</th>
+          <th>Stock Mínimo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of inventoryReport.lowStockItems">
+          <td>{{ item.title }}</td>
+          <td class="low-stock">{{ item.currentStock }}</td>
+          <td>{{ item.minStock }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="!inventoryReport.lowStockItems || inventoryReport.lowStockItems.length === 0">
+      <p class="text-muted">No hay libros con stock bajo</p>
+    </div>
+
+    <!-- Sobre stock -->
+    <h3>Libros con Sobre Stock</h3>
+    <table class="table" *ngIf="inventoryReport.overStockItems?.length > 0">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Stock Actual</th>
+          <th>Stock Máximo</th>
+          <th>Tasa de Rotación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of inventoryReport.overStockItems">
+          <td>{{ item.title }}</td>
+          <td class="over-stock">{{ item.currentStock }}</td>
+          <td>{{ item.maxStock }}</td>
+          <td>{{ item.rotationRate | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="!inventoryReport.overStockItems || inventoryReport.overStockItems.length === 0">
+      <p class="text-muted">No hay libros con sobre stock</p>
+    </div>
+
+    <!-- Resumen de movimientos -->
+    <h3>Resumen de Movimientos de Stock</h3>
+    <div class="movements-grid">
+      <div class="movement-item">
+        <span class="label">Compras:</span>
+        <span class="value">{{ inventoryReport.stockMovementsSummary.purchases }}</span>
+      </div>
+      <div class="movement-item">
+        <span class="label">Ventas:</span>
+        <span class="value">{{ inventoryReport.stockMovementsSummary.sales }}</span>
+      </div>
+      <div class="movement-item">
+        <span class="label">Ajustes:</span>
+        <span class="value">{{ inventoryReport.stockMovementsSummary.adjustments }}</span>
+      </div>
+      <div class="movement-item">
+        <span class="label">Devoluciones:</span>
+        <span class="value">{{ inventoryReport.stockMovementsSummary.returns }}</span>
+      </div>
+    </div>
+  </div>
+</div>

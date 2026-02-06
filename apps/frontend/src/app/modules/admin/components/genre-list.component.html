@@ -1,0 +1,89 @@
+<div class="container">
+  <div class="header">
+    <h1>Gestión de Géneros</h1>
+    <div class="actions">
+      <button class="btn btn-success" (click)="openForm()" *ngIf="!showForm">
+        + Nuevo Género
+      </button>
+      <button class="btn btn-secondary" (click)="exportCSV()">
+        Exportar CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="loading" *ngIf="loading && !showForm">Cargando...</div>
+
+  <!-- Formulario -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <h2>{{ editingGenre ? 'Editar Género' : 'Nuevo Género' }}</h2>
+      <button class="btn btn-close" (click)="closeForm()">×</button>
+    </div>
+    <form [formGroup]="genreForm" (ngSubmit)="submitForm()">
+      <div class="form-group">
+        <label for="name">Nombre *</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="genreForm.get('name')?.invalid && genreForm.get('name')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="genreForm.get('name')?.invalid && genreForm.get('name')?.touched">
+          El nombre es requerido y debe tener al menos 2 caracteres
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-control"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="genreForm.invalid || loading">
+          {{ editingGenre ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla -->
+  <table class="table" *ngIf="!loading && genres.length > 0 && !showForm">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Fecha Creación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let genre of genres">
+        <td>{{ genre.name }}</td>
+        <td>{{ genre.description ? (genre.description.length > 150 ? genre.description.slice(0, 150) + '...' : genre.description) : 'Sin descripción' }}</td>
+        <td>{{ genre.createdAt | date: 'dd/MM/yyyy' }}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="editGenre(genre)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="deleteGenre(genre.id, genre.name)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="no-data" *ngIf="!loading && genres.length === 0 && !showForm">
+    No hay géneros registrados
+  </div>
+</div>

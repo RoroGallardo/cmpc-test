@@ -48,3 +48,5 @@ temp/
 tmp/
 
 .nx/
+
+.angular

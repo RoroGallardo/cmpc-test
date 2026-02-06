@@ -9,79 +9,11 @@ import {
   StockMovement,
   Book,
   MovementType,
-  SaleStatus
+  SaleStatus,
+  IDashboardMetrics,
+  ISalesAnalytics,
+  IInventoryMetrics
 } from '@cmpc-test/shared';
-
-export interface DashboardMetrics {
-  today: {
-    sales: number;
-    revenue: number;
-    orders: number;
-  };
-  thisWeek: {
-    sales: number;
-    revenue: number;
-    orders: number;
-  };
-  thisMonth: {
-    sales: number;
-    revenue: number;
-    orders: number;
-  };
-  inventory: {
-    totalValue: number;
-    totalBooks: number;
-    lowStockCount: number;
-    outOfStockCount: number;
-  };
-  topSelling: Array<{
-    bookId: string;
-    title: string;
-    unitsSold: number;
-    revenue: number;
-  }>;
-  recentSales: Sale[];
-}
-
-export interface SalesAnalytics {
-  totalSales: number;
-  totalRevenue: number;
-  averageOrderValue: number;
-  salesByDay: Array<{ date: string; sales: number; revenue: number }>;
-  salesByCategory: Array<{ category: string; sales: number; revenue: number }>;
-  salesByAuthor: Array<{ author: string; sales: number; revenue: number }>;
-  topProducts: Array<{
-    bookId: string;
-    title: string;
-    unitsSold: number;
-    revenue: number;
-  }>;
-}
-
-export interface InventoryMetrics {
-  totalValue: number;
-  totalUnits: number;
-  averageRotationRate: number;
-  lowStockItems: Array<{
-    bookId: string;
-    title: string;
-    currentStock: number;
-    minStock: number;
-  }>;
-  overStockItems: Array<{
-    bookId: string;
-    title: string;
-    currentStock: number;
-    maxStock: number;
-    rotationRate: number;
-  }>;
-  stockMovementsSummary: {
-    purchases: number;
-    sales: number;
-    adjustments: number;
-    returns: number;
-  };
-}
 
 @Injectable()
 export class AnalyticsService {
@@ -103,20 +35,21 @@ export class AnalyticsService {
   /**
    * Dashboard con métricas en tiempo real
    */
-  async getDashboardMetrics(): Promise<DashboardMetrics> {
+  async getDashboardMetrics(): Promise<IDashboardMetrics> {
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Métricas del día
-    const todayMetrics = await this.getSalesMetricsForPeriod(todayStart, now);
+    const todayMetrics = await this.getSalesMetricsForPeriod(todayStart, todayEnd);
     
     // Métricas de la semana
-    const weekMetrics = await this.getSalesMetricsForPeriod(weekStart, now);
+    const weekMetrics = await this.getSalesMetricsForPeriod(weekStart, todayEnd);
     
     // Métricas del mes
-    const monthMetrics = await this.getSalesMetricsForPeriod(monthStart, now);
+    const monthMetrics = await this.getSalesMetricsForPeriod(monthStart, todayEnd);
 
     // Inventario
     const inventory = await this.getInventorySummary();
@@ -147,7 +80,7 @@ export class AnalyticsService {
   async getSalesAnalytics(
     startDate: Date,
     endDate: Date,
-  ): Promise<SalesAnalytics> {
+  ): Promise<ISalesAnalytics> {
     const sales = await this.saleRepo.find({
       where: {
         createdAt: Between(startDate, endDate),
@@ -186,7 +119,7 @@ export class AnalyticsService {
   /**
    * Métricas de inventario
    */
-  async getInventoryMetrics(): Promise<InventoryMetrics> {
+  async getInventoryMetrics(): Promise<IInventoryMetrics> {
     const inventories = await this.inventoryRepo.find({
       relations: ['book'],
     });

@@ -6,7 +6,8 @@ import {
   IsOptional, 
   IsPositive, 
   MaxLength,
-  MinLength 
+  MinLength,
+  IsDateString
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -21,6 +22,16 @@ export class CreateBookDto {
   @MinLength(1)
   @MaxLength(300)
   title!: string;
+
+  @ApiPropertyOptional({
+    description: 'Fecha de publicación del libro',
+    example: '2020-01-15',
+    type: String,
+    format: 'date',
+  })
+  @IsOptional()
+  @IsDateString()
+  publicationDate?: string;
 
   @ApiProperty({
     description: 'Precio del libro en USD',
@@ -61,6 +72,15 @@ export class CreateBookDto {
   })
   @IsUUID()
   genreId!: string;
+
+  @ApiPropertyOptional({
+    description: 'Stock inicial del libro',
+    example: 100,
+    minimum: 0,
+  })
+  @IsOptional()
+  @IsNumber()
+  stock?: number;
 
   @ApiPropertyOptional({
     description: 'URL de la imagen del libro',

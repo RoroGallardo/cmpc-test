@@ -5,6 +5,7 @@ import { IGenre } from './genre.interface';
 export interface IBook {
   id: string;
   title: string;
+  publicationDate?: Date;
   price: number;
   available: boolean;
   imageUrl?: string;
@@ -18,6 +19,9 @@ export interface IBook {
   author: IAuthor;
   publisher: IPublisher;
   genre: IGenre;
+  
+  // Stock desde Inventory
+  stock?: number;
   
   createdAt: Date;
   updatedAt: Date;

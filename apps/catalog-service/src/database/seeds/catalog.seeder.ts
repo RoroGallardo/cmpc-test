@@ -46,7 +46,7 @@ export class CatalogSeeder implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const nodeEnv = process.env.NODE_ENV;
+    const nodeEnv = process.env['NODE_ENV'];
     // Solo ejecutar automáticamente en desarrollo
     if (nodeEnv === 'development') {
       await this.seedCatalog();

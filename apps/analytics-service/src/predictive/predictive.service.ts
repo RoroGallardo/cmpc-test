@@ -8,30 +8,10 @@ import {
   Inventory,
   StockMovement,
   Book,
-  SaleStatus
+  SaleStatus,
+  IDemandPrediction,
+  IRestockRecommendation
 } from '@cmpc-test/shared';
-
-export interface DemandPrediction {
-  bookId: string;
-  bookTitle: string;
-  currentStock: number;
-  predicted7Days: number;
-  predicted30Days: number;
-  recommendedRestock: number;
-  confidence: number;
-  trend: 'increasing' | 'stable' | 'decreasing';
-}
-
-export interface RestockRecommendation {
-  bookId: string;
-  bookTitle: string;
-  currentStock: number;
-  minStock: number;
-  recommendedQuantity: number;
-  urgency: 'low' | 'medium' | 'high' | 'critical';
-  estimatedDaysUntilStockout: number;
-  estimatedCost: number;
-}
 
 @Injectable()
 export class PredictiveService {
@@ -55,7 +35,7 @@ export class PredictiveService {
   /**
    * Predice la demanda futura de un libro específico
    */
-  async predictDemandForBook(bookId: string): Promise<DemandPrediction> {
+  async predictDemandForBook(bookId: string): Promise<IDemandPrediction> {
     const book = await this.bookRepo.findOne({ where: { id: bookId } });
     if (!book) {
       throw new Error('Book not found');
@@ -96,7 +76,7 @@ export class PredictiveService {
   /**
    * Predice demanda para todos los libros activos
    */
-  async predictDemandForAllBooks(): Promise<DemandPrediction[]> {
+  async predictDemandForAllBooks(): Promise<IDemandPrediction[]> {
     const books = await this.bookRepo.find({
       where: { available: true },
     });
@@ -118,7 +98,7 @@ export class PredictiveService {
   /**
    * Genera recomendaciones de reabastecimiento
    */
-  async getRestockRecommendations(): Promise<RestockRecommendation[]> {
+  async getRestockRecommendations(): Promise<IRestockRecommendation[]> {
     const inventories = await this.inventoryRepo.find({
       relations: ['book'],
     });

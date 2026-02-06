@@ -1,0 +1,102 @@
+<div class="predictive-container">
+  <h1>Análisis Predictivo de Demanda</h1>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="loading" *ngIf="loading">Cargando análisis...</div>
+
+  <div *ngIf="!loading && predictions.length > 0">
+    <!-- Resumen general -->
+    <div class="card">
+      <h2>Predicciones de Demanda por Libro</h2>
+      <p class="text-muted">Predicciones basadas en análisis de ventas históricas</p>
+      
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Libro</th>
+            <th>Stock Actual</th>
+            <th>Predicción 7 días</th>
+            <th>Predicción 30 días</th>
+            <th>Tendencia</th>
+            <th>Confianza</th>
+            <th>Reabastecimiento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prediction of predictions">
+            <td>{{ prediction.bookTitle }}</td>
+            <td>{{ prediction.currentStock }}</td>
+            <td>{{ prediction.predicted7Days }}</td>
+            <td>{{ prediction.predicted30Days }}</td>
+            <td>
+              <span 
+                class="badge"
+                [class.badge-success]="prediction.trend === 'increasing'"
+                [class.badge-warning]="prediction.trend === 'stable'"
+                [class.badge-danger]="prediction.trend === 'decreasing'"
+              >
+                <span *ngIf="prediction.trend === 'increasing'">📈 Creciente</span>
+                <span *ngIf="prediction.trend === 'stable'">➡️ Estable</span>
+                <span *ngIf="prediction.trend === 'decreasing'">📉 Decreciente</span>
+              </span>
+            </td>
+            <td>
+              <div class="confidence-container">
+                <span>{{ prediction.confidence | number:'1.0-0' }}%</span>
+                <div class="confidence-bar">
+                  <div 
+                    class="confidence-fill" 
+                    [style.width.%]="prediction.confidence"
+                  ></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span 
+                class="badge"
+                [class.badge-danger]="prediction.recommendedRestock > 50"
+                [class.badge-warning]="prediction.recommendedRestock > 0 && prediction.recommendedRestock <= 50"
+                [class.badge-success]="prediction.recommendedRestock === 0"
+              >
+                {{ prediction.recommendedRestock === 0 ? 'No necesario' : prediction.recommendedRestock + ' unidades' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Top libros con mayor demanda predicha -->
+    <div class="card">
+      <h2>Top 5 - Mayor Demanda Predicha (30 días)</h2>
+      <div class="top-predictions">
+        <div 
+          *ngFor="let prediction of predictions.slice(0, 5)" 
+          class="prediction-card"
+        >
+          <h3>{{ prediction.bookTitle }}</h3>
+          <div class="prediction-details">
+            <div class="detail-item">
+              <span class="label">Demanda estimada:</span>
+              <span class="value">{{ prediction.predicted30Days }} unidades</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Stock actual:</span>
+              <span class="value">{{ prediction.currentStock }} unidades</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Confianza:</span>
+              <span class="value">{{ prediction.confidence | number:'1.0-0' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && predictions.length === 0">
+    <div class="alert alert-info">
+      No hay datos de predicción disponibles.
+    </div>
+  </div>
+</div>

@@ -151,9 +151,14 @@ export class SalesService {
     }
 
     if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      // Ajustar end date al final del día para incluir todas las ventas de ese día
+      end.setHours(23, 59, 59, 999);
+      
       query.andWhere('sale.createdAt BETWEEN :start AND :end', {
-        start: new Date(startDate),
-        end: new Date(endDate),
+        start,
+        end,
       });
     }
 

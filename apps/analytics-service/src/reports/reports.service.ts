@@ -13,126 +13,13 @@ import {
   Publisher,
   AuditLog,
   SaleStatus,
-  MovementType
+  MovementType,
+  IABCAnalysis,
+  IProfitabilityReport,
+  ISeasonalityReport,
+  IStockRotationReport,
+  IAuditTrailReport
 } from '@cmpc-test/shared';
-
-export interface ABCAnalysis {
-  category: 'A' | 'B' | 'C';
-  books: Array<{
-    bookId: string;
-    title: string;
-    revenue: number;
-    percentageOfTotal: number;
-    cumulativePercentage: number;
-  }>;
-  summary: {
-    totalRevenue: number;
-    percentageOfRevenue: number;
-    count: number;
-    percentageOfProducts: number;
-  };
-}
-
-export interface ProfitabilityReport {
-  byCategory: Array<{
-    categoryName: string;
-    totalRevenue: number;
-    totalCost: number;
-    profit: number;
-    margin: number;
-    unitsSold: number;
-  }>;
-  byAuthor: Array<{
-    authorName: string;
-    totalRevenue: number;
-    profit: number;
-    margin: number;
-    booksSold: number;
-  }>;
-  byPublisher: Array<{
-    publisherName: string;
-    totalRevenue: number;
-    profit: number;
-    margin: number;
-    booksSold: number;
-  }>;
-  overall: {
-    totalRevenue: number;
-    totalCost: number;
-    grossProfit: number;
-    margin: number;
-  };
-}
-
-export interface SeasonalityReport {
-  monthly: Array<{
-    month: string;
-    year: number;
-    sales: number;
-    revenue: number;
-    averageOrderValue: number;
-  }>;
-  dayOfWeek: Array<{
-    day: string;
-    sales: number;
-    revenue: number;
-  }>;
-  trends: {
-    bestMonth: string;
-    worstMonth: string;
-    bestDayOfWeek: string;
-    worstDayOfWeek: string;
-  };
-}
-
-export interface StockRotationReport {
-  fastMoving: Array<{
-    bookId: string;
-    title: string;
-    rotationRate: number;
-    daysToSell: number;
-    currentStock: number;
-  }>;
-  slowMoving: Array<{
-    bookId: string;
-    title: string;
-    rotationRate: number;
-    daysToSell: number;
-    currentStock: number;
-    lastSaleDate: Date | null;
-  }>;
-  deadStock: Array<{
-    bookId: string;
-    title: string;
-    currentStock: number;
-    lastSaleDate: Date | null;
-    daysSinceLastSale: number;
-  }>;
-  summary: {
-    averageRotationRate: number;
-    fastMovingCount: number;
-    slowMovingCount: number;
-    deadStockCount: number;
-  };
-}
-
-export interface AuditTrailReport {
-  changes: Array<{
-    id: string;
-    timestamp: Date;
-    user: string;
-    action: string;
-    entityType: string;
-    entityId: string;
-    changes: Record<string, { old: any; new: any }>;
-  }>;
-  summary: {
-    totalChanges: number;
-    byAction: Record<string, number>;
-    byUser: Record<string, number>;
-    byEntity: Record<string, number>;
-  };
-}
 
 @Injectable()
 export class ReportsService {
@@ -162,7 +49,7 @@ export class ReportsService {
   /**
    * Análisis ABC de inventario (Pareto)
    */
-  async generateABCAnalysis(startDate: Date, endDate: Date): Promise<ABCAnalysis[]> {
+  async generateABCAnalysis(startDate: Date, endDate: Date): Promise<IABCAnalysis[]> {
     // Obtener ventas por libro
     const salesByBook = await this.saleItemRepo
       .createQueryBuilder('item')
@@ -219,7 +106,7 @@ export class ReportsService {
   /**
    * Reporte de rentabilidad por categoría
    */
-  async generateProfitabilityReport(startDate: Date, endDate: Date): Promise<ProfitabilityReport> {
+  async generateProfitabilityReport(startDate: Date, endDate: Date): Promise<IProfitabilityReport> {
     // Por categoría
     const byCategory = await this.saleItemRepo
       .createQueryBuilder('item')
@@ -302,7 +189,7 @@ export class ReportsService {
   /**
    * Análisis de estacionalidad
    */
-  async generateSeasonalityReport(): Promise<SeasonalityReport> {
+  async generateSeasonalityReport(): Promise<ISeasonalityReport> {
     // Por mes
     const monthly = await this.saleRepo
       .createQueryBuilder('sale')
@@ -362,7 +249,7 @@ export class ReportsService {
   /**
    * Reporte de rotación de stock
    */
-  async generateStockRotationReport(): Promise<StockRotationReport> {
+  async generateStockRotationReport(): Promise<IStockRotationReport> {
     const analytics = await this.analyticsRepo.find({
       relations: ['book'],
     });
@@ -434,7 +321,7 @@ export class ReportsService {
     startDate: Date,
     endDate: Date,
     entityId?: string,
-  ): Promise<AuditTrailReport> {
+  ): Promise<IAuditTrailReport> {
     const query = this.auditRepo
       .createQueryBuilder('audit')
       .leftJoinAndSelect('audit.user', 'user')

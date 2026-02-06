@@ -1,0 +1,118 @@
+<div class="sales-container">
+  <div class="header">
+    <h1>Gestión de Ventas</h1>
+    <button class="btn btn-primary" (click)="createSale()">
+      Nueva Venta
+    </button>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="loading" *ngIf="loading">Cargando...</div>
+
+  <table class="table" *ngIf="!loading && sales.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th *ngIf="authService.isAdmin()">Usuario</th>
+        <th>Fecha</th>
+        <th>Total</th>
+        <th>Items</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let sale of sales">
+        <td>{{ sale.id }}</td>
+        <td *ngIf="authService.isAdmin()">
+          {{ sale.seller?.email || 'N/A' }}
+        </td>
+        <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+        <td>${{ sale.total | number:'1.2-2' }}</td>
+        <td>{{ sale.items.length }}</td>
+        <td>
+          <span class="badge" [ngClass]="getStatusClass(sale.status)">
+            {{ getStatusLabel(sale.status) }}
+          </span>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-sm btn-info" (click)="viewSale(sale.id)" title="Ver">
+              👁️
+            </button>
+            <button
+              *ngIf="sale.status === 'PENDING' || sale.status === 'CONFIRMED'"
+              class="btn btn-sm btn-success"
+              (click)="openCompleteSaleModal(sale.id)"
+              title="Completar"
+            >
+              ✓
+            </button>
+            <button
+              *ngIf="sale.status === 'PENDING' || sale.status === 'CONFIRMED'"
+              class="btn btn-sm btn-danger"
+              (click)="cancelSale(sale.id)"
+              title="Cancelar"
+            >
+              ✗
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="no-data" *ngIf="!loading && sales.length === 0">
+    No hay ventas registradas
+  </div>
+</div>
+
+<!-- Modal confirmar venta -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Completar Venta</h2>
+      <button class="modal-close" (click)="closeModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="paymentMethod">Método de Pago *</label>
+        <select 
+          id="paymentMethod" 
+          [(ngModel)]="paymentMethod" 
+          class="form-control"
+        >
+          <option value="">Seleccione un método de pago</option>
+          <option *ngFor="let method of paymentMethods" [value]="method.value">
+            {{ method.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="paymentReference">Referencia de Pago (Opcional)</label>
+        <input 
+          type="text" 
+          id="paymentReference" 
+          [(ngModel)]="paymentReference" 
+          class="form-control"
+          placeholder="Ej: REF-123456"
+        />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">
+        Cancelar
+      </button>
+      <button 
+        class="btn btn-success" 
+        (click)="confirmCompleteSale()"
+        [disabled]="!paymentMethod"
+      >
+        Confirmar Venta
+      </button>
+    </div>
+  </div>
+</div>

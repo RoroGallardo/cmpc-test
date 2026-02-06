@@ -1,0 +1,44 @@
+<div class="layout">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <h2>📚 Sistema de Gestión</h2>
+    </div>
+
+    <div class="navbar-menu">
+      <!-- Menú para Admin -->
+      <div class="menu-items" *ngIf="authService.isAdmin()">
+        <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/admin/users" routerLinkActive="active">Usuarios</a>
+        <a routerLink="/books" routerLinkActive="active">Libros</a>
+        <a routerLink="/admin/authors" routerLinkActive="active">Autores</a>
+        <a routerLink="/admin/genres" routerLinkActive="active">Géneros</a>
+        <a routerLink="/admin/publishers" routerLinkActive="active">Editoriales</a>
+        <a routerLink="/sales" routerLinkActive="active">Ventas</a>
+        <a routerLink="/admin/reports" routerLinkActive="active">Reportes</a>
+        <a routerLink="/admin/predictive" routerLinkActive="active">Análisis Predictivo</a>
+      </div>
+
+      <!-- Menú para User -->
+      <div class="menu-items" *ngIf="!authService.isAdmin()">
+        <a routerLink="/books" routerLinkActive="active">Libros</a>
+        <a routerLink="/sales" routerLinkActive="active">Ventas</a>
+      </div>
+
+      <div class="user-info">
+        <span class="user-name">
+          {{ authService.getCurrentUser()?.email }}
+        </span>
+        <span class="user-role badge">
+          {{ authService.getCurrentUser()?.role }}
+        </span>
+        <button class="btn btn-outline" (click)="logout()">
+          Salir
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

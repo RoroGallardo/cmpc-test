@@ -1,0 +1,105 @@
+<div class="container">
+  <div class="header">
+    <h1>Gestión de Autores</h1>
+    <div class="actions">
+      <button class="btn btn-success" (click)="openForm()" *ngIf="!showForm">
+        + Nuevo Autor
+      </button>
+      <button class="btn btn-secondary" (click)="exportCSV()">
+        Exportar CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="loading" *ngIf="loading && !showForm">Cargando...</div>
+
+  <!-- Formulario -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <h2>{{ editingAuthor ? 'Editar Autor' : 'Nuevo Autor' }}</h2>
+      <button class="btn btn-close" (click)="closeForm()">×</button>
+    </div>
+    <form [formGroup]="authorForm" (ngSubmit)="submitForm()">
+      <div class="form-group">
+        <label for="name">Nombre *</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="authorForm.get('name')?.invalid && authorForm.get('name')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="authorForm.get('name')?.invalid && authorForm.get('name')?.touched">
+          El nombre es requerido y debe tener al menos 2 caracteres
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="birthYear">Año de Nacimiento</label>
+        <input
+          type="number"
+          id="birthYear"
+          formControlName="birthYear"
+          class="form-control"
+          [class.is-invalid]="authorForm.get('birthYear')?.invalid && authorForm.get('birthYear')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="authorForm.get('birthYear')?.invalid && authorForm.get('birthYear')?.touched">
+          El año debe estar entre 1000 y {{ currentYear }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="biography">Biografía</label>
+        <textarea
+          id="biography"
+          formControlName="biography"
+          class="form-control"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="authorForm.invalid || loading">
+          {{ editingAuthor ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla -->
+  <table class="table" *ngIf="!loading && authors.length > 0 && !showForm">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Año Nacimiento</th>
+        <th>Biografía</th>
+        <th>Fecha Creación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let author of authors">
+        <td>{{ author.name }}</td>
+        <td>{{ author.birthYear || 'N/A' }}</td>
+        <td>{{ author.biography ? (author.biography.length > 100 ? author.biography.slice(0, 100) + '...' : author.biography) : 'Sin biografía' }}</td>
+        <td>{{ author.createdAt | date: 'dd/MM/yyyy' }}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="editAuthor(author)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="deleteAuthor(author.id, author.name)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="no-data" *ngIf="!loading && authors.length === 0 && !showForm">
+    No hay autores registrados
+  </div>
+</div>

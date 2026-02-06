@@ -14,8 +14,8 @@ export class KafkaProducerService implements OnModuleInit {
     transport: Transport.KAFKA,
     options: {
       client: {
-        clientId: process.env.KAFKA_CLIENT_ID || 'cmpc-producer',
-        brokers: (process.env.KAFKA_BROKERS || 'localhost:19092').split(','),
+        clientId: process.env['KAFKA_CLIENT_ID'] || 'cmpc-producer',
+        brokers: (process.env['KAFKA_BROKERS'] || 'localhost:19092').split(','),
       },
       producer: {
         allowAutoTopicCreation: true,

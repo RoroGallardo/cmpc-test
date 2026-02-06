@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Book } from './book.entity';
 import { User } from './user.entity';
+import { ISale, ISaleItem } from '../interfaces/sale.interface';
 
 export enum SaleStatus {
   PENDING = 'PENDING',
@@ -32,7 +33,7 @@ export enum PaymentMethod {
 @Index(['sellerId'])
 @Index(['status'])
 @Index(['createdAt'])
-export class Sale {
+export class Sale implements ISale {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -109,7 +110,7 @@ export class Sale {
 @Entity('sale_items')
 @Index(['saleId'])
 @Index(['bookId'])
-export class SaleItem {
+export class SaleItem implements ISaleItem {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -146,6 +147,14 @@ export class SaleItem {
   @Column('decimal', { precision: 10, scale: 2, name: 'subtotal' })
   subtotal!: number;
 
+  // Total calculado: subtotal - discount
+  get total(): number {
+    return Number(this.subtotal) - Number(this.discount);
+  }
+
   @CreateDateColumn()
   createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }

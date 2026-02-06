@@ -2,7 +2,7 @@ import {
   Entity, 
   PrimaryGeneratedColumn, 
   Column,
-  ManyToOne,
+  OneToOne,
   JoinColumn,
   CreateDateColumn, 
   UpdateDateColumn,
@@ -17,7 +17,7 @@ export class Inventory {
   id!: string;
 
   // Relación con Book
-  @ManyToOne(() => Book, { 
+  @OneToOne(() => Book, book => book.inventory, { 
     onDelete: 'CASCADE'
   })
   @JoinColumn({ name: 'book_id' })

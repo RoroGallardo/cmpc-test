@@ -17,7 +17,7 @@ export class KafkaConsumerModule {
     const {
       groupId,
       clientId = 'cmpc-consumer',
-      brokers = (process.env.KAFKA_BROKERS || 'localhost:19092').split(','),
+      brokers = (process.env['KAFKA_BROKERS'] || 'localhost:19092').split(','),
     } = config;
 
     return {
