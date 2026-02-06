@@ -1,0 +1,90 @@
+<div class="detail-container">
+  <div class="loading" *ngIf="loading">Cargando...</div>
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <div class="detail-card" *ngIf="!loading && book">
+    <div class="header">
+      <h1>{{ book.title }}</h1>
+      <div class="actions">
+        <button class="btn btn-secondary" (click)="goBack()">Volver</button>
+        <button class="btn btn-warning" (click)="editBook()">Editar</button>
+        <button class="btn btn-danger" (click)="deleteBook()">Eliminar</button>
+      </div>
+    </div>
+
+    <div class="book-content">
+      <div class="book-image" *ngIf="book.imageBase64">
+        <img [src]="book.imageBase64" [alt]="book.title" />
+      </div>
+      <div class="book-image placeholder" *ngIf="!book.imageBase64">
+        <div class="no-image">Sin imagen</div>
+      </div>
+
+      <div class="book-info">
+        <div class="info-section">
+          <h2>Información General</h2>
+          <div class="info-row">
+            <span class="label">Fecha de Publicación:</span>
+            <span class="value">{{ book.publicationDate | date: 'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Precio:</span>
+            <span class="value">${{ book.price }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Stock:</span>
+            <span class="value">{{ book.stock }} unidades</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Disponible:</span>
+            <span class="value">
+              <span class="badge" [class.badge-success]="book.available" [class.badge-danger]="!book.available">
+                {{ book.available ? 'Sí' : 'No' }}
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h2>Detalles Editoriales</h2>
+          <div class="info-row">
+            <span class="label">Autor:</span>
+            <span class="value">{{ book.author.name }}</span>
+          </div>
+          <div class="info-row" *ngIf="book.author.biography">
+            <span class="label">Biografía:</span>
+            <span class="value">{{ book.author.biography }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Género:</span>
+            <span class="value">{{ book.genre.name }}</span>
+          </div>
+          <div class="info-row" *ngIf="book.genre.description">
+            <span class="label">Descripción:</span>
+            <span class="value">{{ book.genre.description }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Editorial:</span>
+            <span class="value">{{ book.publisher.name }}</span>
+          </div>
+          <div class="info-row" *ngIf="book.publisher.country">
+            <span class="label">País:</span>
+            <span class="value">{{ book.publisher.country }}</span>
+          </div>
+        </div>
+
+        <div class="info-section" *ngIf="book.createdAt || book.updatedAt">
+          <h2>Información del Sistema</h2>
+          <div class="info-row" *ngIf="book.createdAt">
+            <span class="label">Creado:</span>
+            <span class="value">{{ book.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-row" *ngIf="book.updatedAt">
+            <span class="label">Última actualización:</span>
+            <span class="value">{{ book.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

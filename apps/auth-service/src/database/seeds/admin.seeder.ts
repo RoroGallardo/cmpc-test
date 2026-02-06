@@ -61,6 +61,7 @@ export class AdminSeeder implements OnModuleInit {
         password: hashedPassword,
         name: adminName,
         role: UserRole.ADMIN,
+        isActive: true, // Admin siempre activo
       });
 
       await queryRunner.manager.save(admin);

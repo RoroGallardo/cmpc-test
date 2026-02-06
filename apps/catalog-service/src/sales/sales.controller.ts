@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Header } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard, Roles, RolesGuard, UserRole, CreateSaleDto, UpdateSaleStatusDto, FilterSaleDto } from '@cmpc-test/shared';
 import { SalesService } from './sales.service';
@@ -62,6 +62,9 @@ export class SalesController {
 
   @Get()
   @Roles(UserRole.ADMIN)
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   @ApiOperation({ summary: 'Obtener todas las ventas con filtros' })
   @ApiResponse({
     status: 200,
@@ -92,6 +95,9 @@ export class SalesController {
 
   @Get('summary')
   @Roles(UserRole.ADMIN)
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   @ApiOperation({ summary: 'Obtener resumen de ventas en un periodo' })
   @ApiResponse({
     status: 200,
@@ -109,14 +115,35 @@ export class SalesController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
-    return this.salesService.getSummary(
-      new Date(startDate),
-      new Date(endDate),
-    );
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    // Ajustar end date al final del día para incluir todas las ventas de ese día
+    end.setHours(23, 59, 59, 999);
+    
+    return this.salesService.getSummary(start, end);
+  }
+
+  @Get('my-sales')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
+  @ApiOperation({ summary: 'Obtener ventas del usuario autenticado' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de ventas del usuario',
+  })
+  async getMySales(@Query() filterDto: FilterSaleDto) {
+    // TODO: Implementar filtro por usuario cuando se implemente autenticación
+    // Por ahora retorna todas las ventas
+    return this.salesService.findAll(filterDto);
   }
 
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.USER)
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   @ApiOperation({ summary: 'Obtener una venta por ID' })
   @ApiResponse({
     status: 200,

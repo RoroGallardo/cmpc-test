@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Book, CreateBookDto, UpdateBookDto, FilterBookDto, Author, Publisher, Genre } from '@cmpc-test/shared';
+import { Book, CreateBookDto, UpdateBookDto, FilterBookDto, Author, Publisher, Genre, Inventory } from '@cmpc-test/shared';
 import { Parser } from 'json2csv';
 
 @Injectable()
@@ -15,10 +15,12 @@ export class BooksService {
     private readonly publisherRepository: Repository<Publisher>,
     @InjectRepository(Genre)
     private readonly genreRepository: Repository<Genre>,
+    @InjectRepository(Inventory)
+    private readonly inventoryRepository: Repository<Inventory>,
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createBookDto: CreateBookDto): Promise<Book> {
+  async create(createBookDto: CreateBookDto, file?: Express.Multer.File): Promise<Book> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -45,13 +47,29 @@ export class BooksService {
       const book = queryRunner.manager.create(Book, createBookDto);
       const savedBook = await queryRunner.manager.save(book);
 
+      // Crear inventario si se proporcionó stock
+      if (createBookDto.stock !== undefined) {
+        const inventory = queryRunner.manager.create(Inventory, {
+          bookId: savedBook.id,
+          currentStock: createBookDto.stock,
+          minStock: 10,
+          maxStock: 1000,
+        });
+        await queryRunner.manager.save(inventory);
+      }
+
       await queryRunner.commitTransaction();
       
       // Retornar el libro con sus relaciones cargadas
-      return await this.bookRepository.findOne({
+      const bookWithRelations = await this.bookRepository.findOne({
         where: { id: savedBook.id },
-        relations: ['author', 'publisher', 'genre'],
+        relations: ['author', 'publisher', 'genre', 'inventory'],
       });
+      
+      return {
+        ...bookWithRelations,
+        stock: bookWithRelations?.inventory?.currentStock ?? 0
+      } as any;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -77,7 +95,8 @@ export class BooksService {
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.author', 'author')
       .leftJoinAndSelect('book.publisher', 'publisher')
-      .leftJoinAndSelect('book.genre', 'genre');
+      .leftJoinAndSelect('book.genre', 'genre')
+      .leftJoinAndSelect('book.inventory', 'inventory');
 
     // Filtros
     if (search) {
@@ -112,8 +131,14 @@ export class BooksService {
 
     const [data, total] = await queryBuilder.getManyAndCount();
 
+    // Agregar el campo stock desde inventory
+    const booksWithStock = data.map(book => ({
+      ...book,
+      stock: book.inventory?.currentStock ?? 0
+    }));
+
     return {
-      data,
+      data: booksWithStock,
       meta: {
         total,
         page,
@@ -126,17 +151,21 @@ export class BooksService {
   async findOne(id: string): Promise<Book> {
     const book = await this.bookRepository.findOne({
       where: { id },
-      relations: ['author', 'publisher', 'genre'],
+      relations: ['author', 'publisher', 'genre', 'inventory'],
     });
 
     if (!book) {
       throw new NotFoundException(`Libro con ID ${id} no encontrado`);
     }
 
-    return book;
+    // Agregar el campo stock desde inventory
+    return {
+      ...book,
+      stock: book.inventory?.currentStock ?? 0
+    } as any;
   }
 
-  async update(id: string, updateBookDto: UpdateBookDto): Promise<Book> {
+  async update(id: string, updateBookDto: UpdateBookDto, file?: Express.Multer.File): Promise<Book> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -145,7 +174,7 @@ export class BooksService {
       // Buscar el libro dentro de la transacción
       const book = await queryRunner.manager.findOne(Book, {
         where: { id },
-        relations: ['author', 'publisher', 'genre'],
+        relations: ['author', 'publisher', 'genre', 'inventory'],
       });
 
       if (!book) {
@@ -178,16 +207,43 @@ export class BooksService {
       }
 
       // Actualizar el libro dentro de la transacción
-      Object.assign(book, updateBookDto);
+      const { stock, ...bookData } = updateBookDto;
+      Object.assign(book, bookData);
       const updatedBook = await queryRunner.manager.save(book);
+
+      // Actualizar inventario si se proporcionó stock
+      if (stock !== undefined) {
+        let inventory = await queryRunner.manager.findOne(Inventory, {
+          where: { bookId: id },
+        });
+
+        if (inventory) {
+          inventory.currentStock = stock;
+          await queryRunner.manager.save(inventory);
+        } else {
+          // Crear inventario si no existe
+          inventory = queryRunner.manager.create(Inventory, {
+            bookId: id,
+            currentStock: stock,
+            minStock: 10,
+            maxStock: 1000,
+          });
+          await queryRunner.manager.save(inventory);
+        }
+      }
 
       await queryRunner.commitTransaction();
 
       // Retornar el libro actualizado con sus relaciones cargadas
-      return await this.bookRepository.findOne({
+      const bookWithRelations = await this.bookRepository.findOne({
         where: { id: updatedBook.id },
-        relations: ['author', 'publisher', 'genre'],
+        relations: ['author', 'publisher', 'genre', 'inventory'],
       });
+      
+      return {
+        ...bookWithRelations,
+        stock: bookWithRelations?.inventory?.currentStock ?? 0
+      } as any;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -247,7 +303,7 @@ export class BooksService {
       Editorial: book.publisher?.name || '',
       Género: book.genre?.name || '',
       Disponible: book.available ? 'Sí' : 'No',
-      'URL Imagen': book.imageUrl || '',
+      'Tiene Imagen': book.imageBase64 ? 'Sí' : 'No',
       'Fecha Creación': book.createdAt?.toISOString().split('T')[0] || '',
     }));
 

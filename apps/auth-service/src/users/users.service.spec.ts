@@ -16,6 +16,7 @@ describe('UsersService', () => {
     name: 'Test User',
     password: 'hashed_password',
     role: UserRole.USER,
+    isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

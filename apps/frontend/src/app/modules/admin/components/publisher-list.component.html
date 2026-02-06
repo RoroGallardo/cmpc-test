@@ -1,0 +1,111 @@
+<div class="container">
+  <div class="header">
+    <h1>Gestión de Editoriales</h1>
+    <div class="actions">
+      <button class="btn btn-success" (click)="openForm()" *ngIf="!showForm">
+        + Nueva Editorial
+      </button>
+      <button class="btn btn-secondary" (click)="exportCSV()">
+        Exportar CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="loading" *ngIf="loading && !showForm">Cargando...</div>
+
+  <!-- Formulario -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <h2>{{ editingPublisher ? 'Editar Editorial' : 'Nueva Editorial' }}</h2>
+      <button class="btn btn-close" (click)="closeForm()">×</button>
+    </div>
+    <form [formGroup]="publisherForm" (ngSubmit)="submitForm()">
+      <div class="form-group">
+        <label for="name">Nombre *</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="publisherForm.get('name')?.invalid && publisherForm.get('name')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="publisherForm.get('name')?.invalid && publisherForm.get('name')?.touched">
+          El nombre es requerido y debe tener al menos 2 caracteres
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="country">País</label>
+        <input
+          type="text"
+          id="country"
+          formControlName="country"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="website">Sitio Web</label>
+        <input
+          type="url"
+          id="website"
+          formControlName="website"
+          class="form-control"
+          placeholder="https://ejemplo.com"
+          [class.is-invalid]="publisherForm.get('website')?.invalid && publisherForm.get('website')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="publisherForm.get('website')?.invalid && publisherForm.get('website')?.touched">
+          Debe ser una URL válida (http:// o https://)
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="publisherForm.invalid || loading">
+          {{ editingPublisher ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla -->
+  <table class="table" *ngIf="!loading && publishers.length > 0 && !showForm">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>País</th>
+        <th>Sitio Web</th>
+        <th>Fecha Creación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let publisher of publishers">
+        <td>{{ publisher.name }}</td>
+        <td>{{ publisher.country || 'N/A' }}</td>
+        <td>
+          <a *ngIf="publisher.website" [href]="publisher.website" target="_blank" rel="noopener noreferrer">
+            {{ publisher.website }}
+          </a>
+          <span *ngIf="!publisher.website">N/A</span>
+        </td>
+        <td>{{ publisher.createdAt | date: 'dd/MM/yyyy' }}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="editPublisher(publisher)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="deletePublisher(publisher.id, publisher.name)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="no-data" *ngIf="!loading && publishers.length === 0 && !showForm">
+    No hay editoriales registradas
+  </div>
+</div>

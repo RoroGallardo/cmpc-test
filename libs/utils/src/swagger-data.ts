@@ -62,7 +62,7 @@ export const SWAGGER_EXAMPLES = {
       authorId: 'a1234567-89ab-cdef-0123-456789abcdef',
       publisherId: 'b1234567-89ab-cdef-0123-456789abcdef',
       genreId: 'c1234567-89ab-cdef-0123-456789abcdef',
-      imageUrl: 'https://picsum.photos/seed/cien/400/600',
+      imageBase64: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
     },
   },
 
@@ -159,7 +159,7 @@ export const SWAGGER_RESPONSE_EXAMPLES = {
           title: 'Cien años de soledad',
           price: 29.99,
           available: true,
-          imageUrl: 'https://example.com/book.jpg',
+          imageBase64: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
           author: { id: 'xxx', name: 'Gabriel García Márquez' },
           publisher: { id: 'yyy', name: 'Sudamericana' },
           genre: { id: 'zzz', name: 'Ficción' }

@@ -4,6 +4,7 @@ import {
   Column, 
   ManyToOne, 
   JoinColumn,
+  OneToOne,
   CreateDateColumn, 
   UpdateDateColumn, 
   DeleteDateColumn,
@@ -12,16 +13,21 @@ import {
 import { Author } from './author.entity';
 import { Publisher } from './publisher.entity';
 import { Genre } from './genre.entity';
+import { Inventory } from './inventory.entity';
+import { IBook } from '../interfaces/book.interface';
 
 @Entity('books')
 @Index(['title', 'authorId', 'genreId'])
-export class Book {
+export class Book implements IBook {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Index()
   @Column({ length: 300 })
   title!: string;
+  
+  @Column({ type: 'date', nullable: true })
+  publicationDate?: Date;
   
   @Index()
   @Column('decimal', { precision: 10, scale: 2 })
@@ -31,8 +37,8 @@ export class Book {
   @Column({ default: true })
   available!: boolean;
 
-  @Column({ nullable: true })
-  imageUrl!: string;
+  @Column({ type: 'text', nullable: true })
+  imageBase64!: string;
 
   // Relación ManyToOne con Author
   @ManyToOne(() => Author, author => author.books, { 
@@ -68,6 +74,10 @@ export class Book {
   @Column({ name: 'genre_id' })
   @Index()
   genreId!: string;
+
+  // Relación OneToOne con Inventory
+  @OneToOne(() => Inventory, inventory => inventory.book)
+  inventory?: Inventory;
 
   @Index()
   @CreateDateColumn()

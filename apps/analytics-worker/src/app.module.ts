@@ -52,8 +52,8 @@ import { InventoryService } from './services/inventory.service';
       User,
     ]),
     KafkaConsumerModule.register({
-      groupId: process.env.KAFKA_GROUP_ID || 'analytics-group',
-      clientId: process.env.KAFKA_CLIENT_ID || 'analytics-worker',
+      groupId: process.env['KAFKA_GROUP_ID'] || 'analytics-group',
+      clientId: process.env['KAFKA_CLIENT_ID'] || 'analytics-worker',
     }),
   ],
   controllers: [SalesEventConsumer],

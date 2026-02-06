@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="header">
+    <h1>Gestión de Usuarios</h1>
+    <button class="btn btn-primary" routerLink="/admin/users/new">
+      Crear Usuario
+    </button>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="loading" *ngIf="loading">Cargando...</div>
+
+  <table class="table" *ngIf="!loading && users.length > 0">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Nombre</th>
+        <th>Rol</th>
+        <th>Activo</th>
+        <th>Fecha Creación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.email }}</td>
+        <td>{{ user.name }}</td>
+        <td>
+          <span class="badge" [class.badge-primary]="user.role === 'admin'">
+            {{ user.role }}
+          </span>
+        </td>
+        <td>
+          <span class="badge" [class.badge-success]="user.isActive" [class.badge-danger]="!user.isActive">
+            {{ user.isActive ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td>{{ user.createdAt | date: 'dd/MM/yyyy' }}</td>
+        <td class="actions">
+          <button class="btn btn-sm btn-info" [routerLink]="['/admin/users', user.id, 'edit']">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-warning" (click)="toggleStatus(user)">
+            {{ user.isActive ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="deleteUser(user.id)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="no-data" *ngIf="!loading && users.length === 0">
+    No hay usuarios registrados
+  </div>
+</div>

@@ -9,8 +9,8 @@ import * as winston from 'winston';
 export const createWinstonConfig = (
   serviceName: string,
 ): WinstonModuleOptions => {
-  const logLevel = process.env.LOG_LEVEL || 'info';
-  const nodeEnv = process.env.NODE_ENV || 'development';
+  const logLevel = process.env['LOG_LEVEL'] || 'info';
+  const nodeEnv = process.env['NODE_ENV'] || 'development';
 
   const formats = [
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),

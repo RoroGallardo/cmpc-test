@@ -106,17 +106,18 @@ export class AnalyticsService {
   async getDashboardMetrics(): Promise<DashboardMetrics> {
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Métricas del día
-    const todayMetrics = await this.getSalesMetricsForPeriod(todayStart, now);
+    const todayMetrics = await this.getSalesMetricsForPeriod(todayStart, todayEnd);
     
     // Métricas de la semana
-    const weekMetrics = await this.getSalesMetricsForPeriod(weekStart, now);
+    const weekMetrics = await this.getSalesMetricsForPeriod(weekStart, todayEnd);
     
     // Métricas del mes
-    const monthMetrics = await this.getSalesMetricsForPeriod(monthStart, now);
+    const monthMetrics = await this.getSalesMetricsForPeriod(monthStart, todayEnd);
 
     // Inventario
     const inventory = await this.getInventorySummary();

@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Index
 } from 'typeorm';
+import { IAlert } from '../interfaces/alert.interface';
 
 export enum AlertType {
   LOW_STOCK = 'LOW_STOCK',
@@ -34,7 +35,7 @@ export enum AlertStatus {
 @Index(['status', 'severity'])
 @Index(['type'])
 @Index(['createdAt'])
-export class Alert {
+export class Alert implements IAlert {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 

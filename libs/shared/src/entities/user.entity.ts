@@ -33,6 +33,9 @@ export class User {
   })
   role!: UserRole;
 
+  @Column({ default: false })
+  isActive!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

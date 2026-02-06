@@ -10,10 +10,13 @@ import {
   Query,
   Res,
   StreamableFile,
-  Header
+  Header,
+  UseInterceptors,
+  UploadedFile
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody, ApiResponse, ApiConsumes } from '@nestjs/swagger';
 import { CreateBookDto, UpdateBookDto, FilterBookDto, JwtAuthGuard } from '@cmpc-test/shared';
 import { SWAGGER_EXAMPLES, SWAGGER_RESPONSE_EXAMPLES } from '@cmpc-test/utils';
 import { BooksService } from './books.service';
@@ -51,7 +54,9 @@ export class BooksController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'Crear un nuevo libro' })
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({ 
     type: CreateBookDto,
     examples: {
@@ -59,8 +64,11 @@ export class BooksController {
     }
   })
   @ApiResponse({ status: 201, description: 'Libro creado exitosamente' })
-  create(@Body() createBookDto: CreateBookDto) {
-    return this.booksService.create(createBookDto);
+  create(
+    @Body() createBookDto: CreateBookDto,
+    @UploadedFile() file?: Express.Multer.File
+  ) {
+    return this.booksService.create(createBookDto, file);
   }
 
   @Get()
@@ -76,7 +84,9 @@ export class BooksController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'Actualizar un libro' })
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({ 
     type: UpdateBookDto,
     examples: {
@@ -85,8 +95,12 @@ export class BooksController {
   })
   @ApiResponse({ status: 200, description: 'Libro actualizado exitosamente' })
   @ApiResponse({ status: 404, description: 'Libro no encontrado' })
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(id, updateBookDto);
+  update(
+    @Param('id') id: string, 
+    @Body() updateBookDto: UpdateBookDto,
+    @UploadedFile() file?: Express.Multer.File
+  ) {
+    return this.booksService.update(id, updateBookDto, file);
   }
 
   @Delete(':id')

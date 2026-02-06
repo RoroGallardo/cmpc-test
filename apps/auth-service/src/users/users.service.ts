@@ -1,7 +1,8 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { User, RegisterDto } from '@cmpc-test/shared';
+import { User, RegisterDto, UpdateUserDto } from '@cmpc-test/shared';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -53,7 +54,35 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.userRepository.find({
-      select: ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'],
+      select: ['id', 'email', 'name', 'role', 'isActive', 'createdAt', 'updatedAt'],
     });
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findById(id);
+
+    // Si se está actualizando la contraseña, hashearla
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    // Si se está actualizando el email, verificar que no exista
+    if (updateUserDto.email && updateUserDto.email !== user.email) {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: updateUserDto.email },
+      });
+      if (existingUser) {
+        throw new ConflictException('El email ya está registrado');
+      }
+    }
+
+    Object.assign(user, updateUserDto);
+    return this.userRepository.save(user);
+  }
+
+  async toggleStatus(id: string): Promise<User> {
+    const user = await this.findById(id);
+    user.isActive = !user.isActive;
+    return this.userRepository.save(user);
   }
 }

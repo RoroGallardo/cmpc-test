@@ -46,7 +46,7 @@ export class CatalogSeeder implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const nodeEnv = process.env.NODE_ENV;
+    const nodeEnv = process.env['NODE_ENV'];
     // Solo ejecutar automáticamente en desarrollo
     if (nodeEnv === 'development') {
       await this.seedCatalog();
@@ -89,7 +89,7 @@ export class CatalogSeeder implements OnModuleInit {
           authorId: authors[book.authorIndex].id,
           publisherId: publishers[book.publisherIndex].id,
           genreId: genres[book.genreIndex].id,
-          imageUrl: book.imageUrl,
+          imageBase64: book.imageBase64,
         })),
       );
 

@@ -25,6 +25,9 @@ export class AnalyticsController {
     const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const end = endDate ? new Date(endDate) : new Date();
     
+    // Ajustar end date al final del día para incluir todas las ventas de ese día
+    end.setHours(23, 59, 59, 999);
+    
     return this.analyticsService.getSalesAnalytics(start, end);
   }
 

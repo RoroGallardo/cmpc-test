@@ -6,9 +6,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const logger = new Logger('Analytics Worker');
   
-  const brokers = (process.env.KAFKA_BROKERS || 'localhost:9092').split(',');
-  const clientId = process.env.KAFKA_CLIENT_ID || 'analytics-worker';
-  const groupId = process.env.KAFKA_GROUP_ID || 'analytics-group';
+  const brokers = (process.env['KAFKA_BROKERS'] || 'localhost:9092').split(',');
+  const clientId = process.env['KAFKA_CLIENT_ID'] || 'analytics-worker';
+  const groupId = process.env['KAFKA_GROUP_ID'] || 'analytics-group';
 
   logger.log('🔧 Configurando Analytics Worker...');
   logger.log(`📡 Brokers: ${brokers.join(', ')}`);

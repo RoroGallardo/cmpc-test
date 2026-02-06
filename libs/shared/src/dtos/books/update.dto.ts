@@ -6,7 +6,8 @@ import {
   IsOptional, 
   IsPositive, 
   MaxLength,
-  MinLength 
+  MinLength,
+  IsDateString
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -22,6 +23,16 @@ export class UpdateBookDto {
   @MinLength(1)
   @MaxLength(300)
   title?: string;
+
+  @ApiPropertyOptional({
+    description: 'Fecha de publicación del libro',
+    example: '2020-01-15',
+    type: String,
+    format: 'date',
+  })
+  @IsOptional()
+  @IsDateString()
+  publicationDate?: string;
 
   @ApiPropertyOptional({
     description: 'Precio del libro en USD',
@@ -69,10 +80,19 @@ export class UpdateBookDto {
   genreId?: string;
 
   @ApiPropertyOptional({
-    description: 'URL de la imagen del libro',
-    example: 'https://example.com/book-cover.jpg',
+    description: 'Stock del libro',
+    example: 100,
+    minimum: 0,
+  })
+  @IsOptional()
+  @IsNumber()
+  stock?: number;
+
+  @ApiPropertyOptional({
+    description: 'Imagen del libro en formato base64',
+    example: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
   })
   @IsOptional()
   @IsString()
-  imageUrl?: string;
+  imageBase64?: string;
 }
