@@ -691,18 +691,18 @@ graph TB
 ```mermaid
 graph LR
     subgraph "External Dependencies"
-        NESTJS[@nestjs/core<br/>@nestjs/common]
-        TYPEORM[typeorm]
-        ANGULAR[@angular/core]
-        RXJS[rxjs]
-        KAFKA[kafkajs]
-        TENSORFLOW[@tensorflow/tfjs-node]
-        JEST[jest]
+        NESTJS[NestJS Framework]
+        TYPEORM[TypeORM]
+        ANGULAR[Angular Framework]
+        RXJS[RxJS]
+        KAFKA[KafkaJS]
+        TENSORFLOW[TensorFlow.js]
+        JEST[Jest]
     end
     
     subgraph "Internal Packages"
-        SHARED[@cmpc-test/shared]
-        UTILS[@cmpc-test/utils]
+        SHARED[Shared Library]
+        UTILS[Utils Library]
     end
     
     subgraph "Applications"
@@ -1135,8 +1135,8 @@ graph TB
     DISK_CHECK --> STATUS
     MEMORY_CHECK --> STATUS
     
-    STATUS -->|Yes| HEALTHY[200 OK<br/>{status: 'up'}]
-    STATUS -->|No| UNHEALTHY[503 Service Unavailable<br/>{status: 'down', details}]
+    STATUS -->|Yes| HEALTHY[200 OK<br/>Status: UP]
+    STATUS -->|No| UNHEALTHY[503 Service Unavailable<br/>Status: DOWN]
     
     style HEALTHY fill:#6bff6b
     style UNHEALTHY fill:#ff6b6b

@@ -90,7 +90,7 @@ erDiagram
     Inventory ||--o{ StockMovement : "tracks"
     Inventory {
         uuid id PK
-        uuid bookId FK UK
+        uuid bookId FK
         int currentStock
         int minimumStock
         int maximumStock
@@ -113,7 +113,7 @@ erDiagram
     
     BookAnalytics {
         uuid id PK
-        uuid bookId FK UK
+        uuid bookId FK
         int totalSales
         decimal totalRevenue
         int averageMonthlySales
