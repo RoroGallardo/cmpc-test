@@ -38,6 +38,10 @@ dist/
 .env.*.local
 **/.env
 
+# Generated environment configs (auto-generated from .env)
+apps/frontend/src/environments/environment.ts
+apps/frontend/src/environments/environment.prod.ts
+
 # Test coverage
 coverage/
 .nyc_output/

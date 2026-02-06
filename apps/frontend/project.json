@@ -6,9 +6,17 @@
   "sourceRoot": "apps/frontend/src",
   "tags": [],
   "targets": {
+    "generate-env": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node apps/frontend/scripts/generate-env-config.js",
+        "cwd": "{workspaceRoot}"
+      }
+    },
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
+      "dependsOn": ["generate-env"],
       "options": {
         "outputPath": "dist/apps/frontend",
         "index": "apps/frontend/src/index.html",
@@ -53,6 +61,7 @@
     "serve": {
       "continuous": true,
       "executor": "@angular-devkit/build-angular:dev-server",
+      "dependsOn": ["generate-env"],
       "configurations": {
         "production": {
           "buildTarget": "frontend:build:production"
