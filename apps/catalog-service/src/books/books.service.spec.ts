@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { BooksService } from './books.service';
-import { Book, CreateBookDto, UpdateBookDto, FilterBookDto, Author, Publisher, Genre } from '@cmpc-test/shared';
+import { Book, CreateBookDto, UpdateBookDto, FilterBookDto, Author, Publisher, Genre, Inventory } from '@cmpc-test/shared';
 
 describe('BooksService', () => {
   let service: BooksService;
@@ -96,6 +96,12 @@ describe('BooksService', () => {
     findOne: jest.fn(),
   };
 
+  const mockInventoryRepository = {
+    findOne: jest.fn(),
+    save: jest.fn(),
+    create: jest.fn(),
+  };
+
   const mockDataSource = {
     createQueryRunner: jest.fn(() => mockQueryRunner),
   };
@@ -119,6 +125,10 @@ describe('BooksService', () => {
         {
           provide: getRepositoryToken(Genre),
           useValue: mockGenreRepository,
+        },
+        {
+          provide: getRepositoryToken(Inventory),
+          useValue: mockInventoryRepository,
         },
         {
           provide: DataSource,
@@ -165,7 +175,10 @@ describe('BooksService', () => {
       expect(mockQueryRunner.startTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
-      expect(result).toEqual(mockBook);
+      expect(result).toEqual({
+        ...mockBook,
+        stock: 0,
+      });
     });
 
     it('debería lanzar BadRequestException si el autor no existe', async () => {
@@ -223,7 +236,10 @@ describe('BooksService', () => {
       const result = await service.findAll(filterDto);
 
       expect(result).toEqual({
-        data: [mockBook],
+        data: [{
+          ...mockBook,
+          stock: 0,
+        }],
         meta: {
           total: 1,
           page: 1,
@@ -423,9 +439,12 @@ describe('BooksService', () => {
 
       expect(mockBookRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'book-123' },
-        relations: ['author', 'publisher', 'genre'],
+        relations: ['author', 'publisher', 'genre', 'inventory'],
       });
-      expect(result).toEqual(mockBook);
+      expect(result).toEqual({
+        ...mockBook,
+        stock: 0,
+      });
     });
 
     it('debería lanzar NotFoundException si el libro no existe', async () => {
@@ -456,7 +475,10 @@ describe('BooksService', () => {
       expect(mockQueryRunner.startTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
-      expect(result).toEqual(updatedBook);
+      expect(result).toEqual({
+        ...updatedBook,
+        stock: 0,
+      });
     });
 
     it('debería lanzar NotFoundException si el libro no existe', async () => {
@@ -483,7 +505,10 @@ describe('BooksService', () => {
       const result = await service.update('book-123', updateWithAuthor);
 
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-      expect(result).toEqual(updatedBook);
+      expect(result).toEqual({
+        ...updatedBook,
+        stock: 0,
+      });
     });
 
     it('debería actualizar un libro con nueva editorial', async () => {
@@ -502,7 +527,10 @@ describe('BooksService', () => {
       const result = await service.update('book-123', updateWithPublisher);
 
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-      expect(result).toEqual(updatedBook);
+      expect(result).toEqual({
+        ...updatedBook,
+        stock: 0,
+      });
     });
 
     it('debería actualizar un libro con nuevo género', async () => {
@@ -521,7 +549,10 @@ describe('BooksService', () => {
       const result = await service.update('book-123', updateWithGenre);
 
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-      expect(result).toEqual(updatedBook);
+      expect(result).toEqual({
+        ...updatedBook,
+        stock: 0,
+      });
     });
 
     it('debería lanzar BadRequestException si el nuevo autor no existe', async () => {

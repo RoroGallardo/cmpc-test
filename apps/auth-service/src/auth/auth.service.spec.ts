@@ -29,6 +29,7 @@ describe('AuthService', () => {
     name: 'Test User',
     password: 'hashed_password',
     role: 'user',
+    isActive: true,
   };
 
   beforeEach(async () => {
@@ -89,6 +90,7 @@ describe('AuthService', () => {
           email: mockUser.email,
           name: mockUser.name,
           role: mockUser.role,
+          isActive: mockUser.isActive,
         },
       });
     });
@@ -118,6 +120,7 @@ describe('AuthService', () => {
           email: mockUser.email,
           name: mockUser.name,
           role: mockUser.role,
+          isActive: mockUser.isActive,
         },
       });
     });

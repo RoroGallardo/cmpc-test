@@ -81,7 +81,7 @@ export class PredictiveService {
       where: { available: true },
     });
 
-    const predictions: DemandPrediction[] = [];
+    const predictions: IDemandPrediction[] = [];
 
     for (const book of books) {
       try {
@@ -103,7 +103,7 @@ export class PredictiveService {
       relations: ['book'],
     });
 
-    const recommendations: RestockRecommendation[] = [];
+    const recommendations: IRestockRecommendation[] = [];
 
     for (const inv of inventories) {
       try {

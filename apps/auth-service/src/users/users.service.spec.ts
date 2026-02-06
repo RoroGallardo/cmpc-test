@@ -167,7 +167,7 @@ describe('UsersService', () => {
       const result = await service.findAll();
 
       expect(mockRepository.find).toHaveBeenCalledWith({
-        select: ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'],
+        select: ['id', 'email', 'name', 'role', 'isActive', 'createdAt', 'updatedAt'],
       });
       expect(result).toEqual(users);
     });
