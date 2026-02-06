@@ -21,7 +21,7 @@ export class BookFormComponent implements OnInit {
   bookId: string | null = null;
   loading = false;
   error = '';
-  selectedFile: File | null = null;
+  imageBase64: string | null = null;
   imagePreview: string | null = null;
 
   constructor(
@@ -32,9 +32,10 @@ export class BookFormComponent implements OnInit {
   ) {
     this.bookForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      publicationDate: ['', Validators.required],
+      publicationDate: [''],
       stock: [0, [Validators.required, Validators.min(0)]],
       price: [0, [Validators.required, Validators.min(0)]],
+      available: [true, Validators.required],
       authorId: ['', Validators.required],
       genreId: ['', Validators.required],
       publisherId: ['', Validators.required],
@@ -92,13 +93,15 @@ export class BookFormComponent implements OnInit {
           publicationDate: publicationDate,
           stock: book.stock,
           price: book.price,
+          available: book.available,
           authorId: book.author.id,
           genreId: book.genre.id,
           publisherId: book.publisher.id,
         });
         
-        if (book.imageUrl) {
-          this.imagePreview = book.imageUrl;
+        if (book.imageBase64) {
+          this.imagePreview = book.imageBase64;
+          this.imageBase64 = book.imageBase64;
         }
         
         this.loading = false;
@@ -113,14 +116,15 @@ export class BookFormComponent implements OnInit {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.selectedFile = input.files[0];
+      const file = input.files[0];
 
-      // Preview de la imagen
+      // Convertir a base64
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.imagePreview = e.target?.result as string;
+        this.imageBase64 = e.target?.result as string;
+        this.imagePreview = this.imageBase64;
       };
-      reader.readAsDataURL(this.selectedFile);
+      reader.readAsDataURL(file);
     }
   }
 
@@ -138,7 +142,7 @@ export class BookFormComponent implements OnInit {
     const formData: any = {
       title: formValues.title,
       price: parseFloat(formValues.price),
-      available: true,
+      available: formValues.available,
       authorId: formValues.authorId,
       genreId: formValues.genreId,
       publisherId: formValues.publisherId,
@@ -154,9 +158,9 @@ export class BookFormComponent implements OnInit {
       formData.stock = parseInt(formValues.stock, 10);
     }
 
-    // Solo agregar image si existe
-    if (this.selectedFile) {
-      formData.image = this.selectedFile;
+    // Solo agregar imageBase64 si existe
+    if (this.imageBase64) {
+      formData.imageBase64 = this.imageBase64;
     }
 
     const request = this.isEditMode && this.bookId

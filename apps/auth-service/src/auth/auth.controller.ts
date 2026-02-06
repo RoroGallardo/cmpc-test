@@ -52,6 +52,23 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Post('public-register')
+  @ApiOperation({ summary: 'Registro público de usuario (crea usuario inactivo)' })
+  @ApiBody({ 
+    type: RegisterDto,
+    examples: {
+      'Ejemplo': { value: SWAGGER_EXAMPLES.register.simple }
+    }
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuario registrado exitosamente, pendiente de activación',
+  })
+  @ApiResponse({ status: 409, description: 'El email ya está registrado' })
+  async publicRegister(@Body() registerDto: RegisterDto) {
+    return this.authService.publicRegister(registerDto);
+  }
+
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

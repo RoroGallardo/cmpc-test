@@ -45,6 +45,10 @@
         <span *ngIf="!loading">Iniciar Sesión</span>
         <span *ngIf="loading">Cargando...</span>
       </button>
+
+      <div class="register-link">
+        <p>¿No tienes cuenta? <a [routerLink]="['/auth/register']">Regístrate</a></p>
+      </div>
     </form>
   </div>
 </div>

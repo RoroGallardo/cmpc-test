@@ -1,0 +1,102 @@
+<div class="container">
+  <h1>{{ isEditMode ? 'Editar Usuario' : 'Crear Usuario' }}</h1>
+
+  <div class="card">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Nombre Completo *</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="name?.invalid && name?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="name?.invalid && name?.touched">
+          <div *ngIf="name?.errors?.['required']">El nombre es requerido</div>
+          <div *ngIf="name?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="email?.invalid && email?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="email?.invalid && email?.touched">
+          <div *ngIf="email?.errors?.['required']">El email es requerido</div>
+          <div *ngIf="email?.errors?.['email']">Email inválido</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña {{ isEditMode ? '(dejar vacío para no cambiar)' : '*' }}</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.is-invalid]="password?.invalid && password?.touched"
+          placeholder="{{ isEditMode ? 'Nueva contraseña (opcional)' : 'Mínimo 6 caracteres' }}"
+        />
+        <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
+          <div *ngIf="password?.errors?.['required']">La contraseña es requerida</div>
+          <div *ngIf="password?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Rol *</label>
+        <select
+          id="role"
+          formControlName="role"
+          class="form-control"
+          [class.is-invalid]="role?.invalid && role?.touched"
+        >
+          <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="role?.invalid && role?.touched">
+          <div *ngIf="role?.errors?.['required']">El rol es requerido</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="checkbox-wrapper">
+          <input
+            type="checkbox"
+            id="isActive"
+            formControlName="isActive"
+          />
+          <label for="isActive">Usuario Activo</label>
+        </div>
+        <small class="text-muted">Los usuarios inactivos no pueden iniciar sesión</small>
+      </div>
+
+      <div class="alert alert-danger" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <div class="button-group">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="loading"
+        >
+          {{ loading ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear Usuario') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancel()"
+          [disabled]="loading"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

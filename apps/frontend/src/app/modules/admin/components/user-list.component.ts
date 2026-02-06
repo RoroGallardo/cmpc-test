@@ -50,7 +50,7 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  deleteUser(id: number): void {
+  deleteUser(id: string): void {
     if (confirm('¿Está seguro de eliminar este usuario?')) {
       this.userService.deleteUser(id).subscribe({
         next: () => {

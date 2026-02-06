@@ -89,10 +89,10 @@ export class UpdateBookDto {
   stock?: number;
 
   @ApiPropertyOptional({
-    description: 'URL de la imagen del libro',
-    example: 'https://example.com/book-cover.jpg',
+    description: 'Imagen del libro en formato base64',
+    example: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
   })
   @IsOptional()
   @IsString()
-  imageUrl?: string;
+  imageBase64?: string;
 }

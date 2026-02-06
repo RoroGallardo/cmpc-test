@@ -67,7 +67,7 @@ export interface SeedBook {
   authorIndex: number;
   publisherIndex: number;
   genreIndex: number;
-  imageUrl: string;
+  imageBase64?: string;
 }
 
 export const SEED_BOOKS: SeedBook[] = [
@@ -78,7 +78,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 0,
     publisherIndex: 0,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/cien/400/600',
   },
   {
     title: 'La casa de los espíritus',
@@ -87,7 +86,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 1,
     publisherIndex: 1,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/casa/400/600',
   },
   {
     title: 'Ficciones',
@@ -96,7 +94,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 2,
     publisherIndex: 2,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/ficc/400/600',
   },
   {
     title: 'Veinte poemas de amor',
@@ -105,7 +102,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 3,
     publisherIndex: 0,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/veinte/400/600',
   },
   {
     title: 'Rayuela',
@@ -114,7 +110,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 4,
     publisherIndex: 0,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/rayuela/400/600',
   },
   {
     title: 'La ciudad y los perros',
@@ -123,7 +118,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 5,
     publisherIndex: 4,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/ciudad/400/600',
   },
   {
     title: 'Como agua para chocolate',
@@ -132,7 +126,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 6,
     publisherIndex: 1,
     genreIndex: 5,
-    imageUrl: 'https://picsum.photos/seed/agua/400/600',
   },
   {
     title: '2666',
@@ -141,7 +134,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 7,
     publisherIndex: 3,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/2666/400/600',
   },
   {
     title: 'El amor en los tiempos del cólera',
@@ -150,7 +142,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 0,
     publisherIndex: 0,
     genreIndex: 5,
-    imageUrl: 'https://picsum.photos/seed/amor/400/600',
   },
   {
     title: 'Eva Luna',
@@ -159,7 +150,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 1,
     publisherIndex: 1,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/eva/400/600',
   },
   {
     title: 'El Aleph',
@@ -168,7 +158,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 2,
     publisherIndex: 2,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/aleph/400/600',
   },
   {
     title: 'Bestiario',
@@ -177,7 +166,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 4,
     publisherIndex: 0,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/best/400/600',
   },
   {
     title: 'Conversación en La Catedral',
@@ -186,7 +174,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 5,
     publisherIndex: 4,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/conver/400/600',
   },
   {
     title: 'Los detectives salvajes',
@@ -195,7 +182,6 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 7,
     publisherIndex: 3,
     genreIndex: 0,
-    imageUrl: 'https://picsum.photos/seed/detec/400/600',
   },
   {
     title: 'Paula',
@@ -204,6 +190,5 @@ export const SEED_BOOKS: SeedBook[] = [
     authorIndex: 1,
     publisherIndex: 1,
     genreIndex: 1,
-    imageUrl: 'https://picsum.photos/seed/paula/400/600',
   },
 ];

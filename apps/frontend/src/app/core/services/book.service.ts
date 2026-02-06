@@ -44,27 +44,11 @@ export class BookService {
   }
 
   createBook(book: CreateBookDto): Observable<Book> {
-    // Si hay imagen, usar FormData; si no, enviar JSON
-    if (book.image instanceof File) {
-      const formData = this.createFormData(book);
-      return this.http.post<Book>(`${this.API_URL}/books`, formData);
-    } else {
-      // Enviar como JSON sin el campo image
-      const { image, ...bookData } = book;
-      return this.http.post<Book>(`${this.API_URL}/books`, bookData);
-    }
+    return this.http.post<Book>(`${this.API_URL}/books`, book);
   }
 
   updateBook(id: string, book: UpdateBookDto): Observable<Book> {
-    // Si hay imagen, usar FormData; si no, enviar JSON
-    if (book.image instanceof File) {
-      const formData = this.createFormData(book);
-      return this.http.patch<Book>(`${this.API_URL}/books/${id}`, formData);
-    } else {
-      // Enviar como JSON sin el campo image
-      const { image, ...bookData } = book;
-      return this.http.patch<Book>(`${this.API_URL}/books/${id}`, bookData);
-    }
+    return this.http.patch<Book>(`${this.API_URL}/books/${id}`, book);
   }
 
   deleteBook(id: string): Observable<void> {
@@ -83,20 +67,9 @@ export class BookService {
     return this.http.get<Publisher[]>(`${this.API_URL}/publishers`);
   }
 
-  private createFormData(book: CreateBookDto | UpdateBookDto): FormData {
-    const formData = new FormData();
-
-    Object.keys(book).forEach((key) => {
-      const value = (book as any)[key];
-      if (value !== undefined && value !== null) {
-        if (key === 'image' && value instanceof File) {
-          formData.append('image', value, value.name);
-        } else if (key !== 'image') {
-          formData.append(key, value.toString());
-        }
-      }
+  exportCSV(): Observable<Blob> {
+    return this.http.get(`${this.API_URL}/books/export/csv`, {
+      responseType: 'blob',
     });
-
-    return formData;
   }
 }

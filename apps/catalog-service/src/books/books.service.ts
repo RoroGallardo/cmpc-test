@@ -20,7 +20,7 @@ export class BooksService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createBookDto: CreateBookDto): Promise<Book> {
+  async create(createBookDto: CreateBookDto, file?: Express.Multer.File): Promise<Book> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -165,7 +165,7 @@ export class BooksService {
     } as any;
   }
 
-  async update(id: string, updateBookDto: UpdateBookDto): Promise<Book> {
+  async update(id: string, updateBookDto: UpdateBookDto, file?: Express.Multer.File): Promise<Book> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -303,7 +303,7 @@ export class BooksService {
       Editorial: book.publisher?.name || '',
       Género: book.genre?.name || '',
       Disponible: book.available ? 'Sí' : 'No',
-      'URL Imagen': book.imageUrl || '',
+      'Tiene Imagen': book.imageBase64 ? 'Sí' : 'No',
       'Fecha Creación': book.createdAt?.toISOString().split('T')[0] || '',
     }));
 

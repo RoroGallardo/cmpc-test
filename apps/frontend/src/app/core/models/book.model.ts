@@ -6,7 +6,7 @@ export interface Book {
   publicationDate: string;
   stock: number;
   price: number;
-  imageUrl?: string;
+  imageBase64?: string;
   available: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -63,7 +63,7 @@ export interface CreateBookDto {
   authorId: string;
   genreId: string;
   publisherId: string;
-  image?: File;
+  imageBase64?: string;
 }
 
 export interface UpdateBookDto extends Partial<CreateBookDto> {

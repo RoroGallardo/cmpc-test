@@ -3,7 +3,7 @@ import { LayoutComponent } from './shared/components/layout.component';
 import { AuthGuard } from './core/guards/auth.guard';
 
 export const appRoutes: Route[] = [
-  { path: 'login', loadChildren: () => import('./modules/auth/auth.module').then((m) => m.AuthModule) },
+  { path: 'auth', loadChildren: () => import('./modules/auth/auth.module').then((m) => m.AuthModule) },
   {
     path: '',
     component: LayoutComponent,

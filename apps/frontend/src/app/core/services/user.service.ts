@@ -16,19 +16,19 @@ export class UserService {
     return this.http.get<User[]>(`${this.API_URL}/users`);
   }
 
-  getUser(id: number): Observable<User> {
+  getUser(id: string): Observable<User> {
     return this.http.get<User>(`${this.API_URL}/users/${id}`);
   }
 
-  updateUser(id: number, data: Partial<User>): Observable<User> {
+  updateUser(id: string, data: Partial<User>): Observable<User> {
     return this.http.put<User>(`${this.API_URL}/users/${id}`, data);
   }
 
-  deleteUser(id: number): Observable<void> {
+  deleteUser(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/users/${id}`);
   }
 
-  toggleUserStatus(id: number): Observable<User> {
+  toggleUserStatus(id: string): Observable<User> {
     return this.http.patch<User>(`${this.API_URL}/users/${id}/toggle-status`, {});
   }
 }

@@ -39,7 +39,7 @@ export interface SaleItem {
   book?: {
     id: string;
     title: string;
-    imageUrl?: string;
+    imageBase64?: string;
   };
 }
 

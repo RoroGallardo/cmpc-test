@@ -2,9 +2,16 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 
   h1 {
-    margin-bottom: 2rem;
+    margin: 0;
     color: #333;
   }
 }
@@ -35,6 +42,10 @@
   }
 }
 
+.actions {
+  white-space: nowrap;
+}
+
 .btn {
   padding: 0.5rem 1rem;
   border: none;
@@ -42,15 +53,26 @@
   cursor: pointer;
   font-size: 0.9rem;
   margin-right: 0.5rem;
-  transition: opacity 0.3s;
+  transition: all 0.3s;
 
-  &:hover {
+  &:hover:not(:disabled) {
     opacity: 0.8;
+    transform: translateY(-1px);
+  }
+
+  &.btn-primary {
+    background-color: #667eea;
+    color: white;
   }
 
   &.btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
+  }
+
+  &.btn-info {
+    background-color: #17a2b8;
+    color: white;
   }
 
   &.btn-warning {

@@ -13,10 +13,10 @@
     </div>
 
     <div class="book-content">
-      <div class="book-image" *ngIf="book.imageUrl">
-        <img [src]="book.imageUrl" [alt]="book.title" />
+      <div class="book-image" *ngIf="book.imageBase64">
+        <img [src]="book.imageBase64" [alt]="book.title" />
       </div>
-      <div class="book-image placeholder" *ngIf="!book.imageUrl">
+      <div class="book-image placeholder" *ngIf="!book.imageBase64">
         <div class="no-image">Sin imagen</div>
       </div>
 

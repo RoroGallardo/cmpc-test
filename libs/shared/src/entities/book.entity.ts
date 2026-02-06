@@ -37,8 +37,8 @@ export class Book implements IBook {
   @Column({ default: true })
   available!: boolean;
 
-  @Column({ nullable: true })
-  imageUrl!: string;
+  @Column({ type: 'text', nullable: true })
+  imageBase64!: string;
 
   // Relación ManyToOne con Author
   @ManyToOne(() => Author, author => author.books, { 

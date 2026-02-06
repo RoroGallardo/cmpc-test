@@ -225,6 +225,8 @@ export class AnalyticsService {
     let outOfStockCount = 0;
 
     for (const inv of inventories) {
+      if (!inv.book) continue;
+      
       totalValue += inv.currentStock * Number(inv.book.price);
       
       if (inv.currentStock === 0) {

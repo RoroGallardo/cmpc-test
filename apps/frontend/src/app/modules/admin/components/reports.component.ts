@@ -30,6 +30,7 @@ export class ReportsComponent {
   generateSalesReport(): void {
     this.loading = true;
     this.error = '';
+    this.inventoryReport = null; // Ocultar reporte de inventario
     this.cdr.detectChanges();
     const filters = this.filterForm.value;
 
@@ -50,6 +51,7 @@ export class ReportsComponent {
   generateInventoryReport(): void {
     this.loading = true;
     this.error = '';
+    this.salesReport = null; // Ocultar reporte de ventas
     this.cdr.detectChanges();
 
     this.analyticsService.getInventoryMetrics().subscribe({

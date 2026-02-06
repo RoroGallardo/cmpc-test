@@ -1,8 +1,7 @@
 export interface User {
-  id: number;
+  id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   role: 'admin' | 'user';
   isActive: boolean;
   createdAt?: string;
@@ -22,6 +21,7 @@ export interface LoginResponse {
 export interface RegisterRequest {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  role?: 'admin' | 'user';
+  isActive?: boolean;
 }

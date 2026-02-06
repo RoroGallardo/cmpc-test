@@ -8,7 +8,7 @@ export interface IBook {
   publicationDate?: Date;
   price: number;
   available: boolean;
-  imageUrl?: string;
+  imageBase64?: string;
   
   // IDs para las relaciones
   authorId: string;

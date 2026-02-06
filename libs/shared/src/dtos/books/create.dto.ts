@@ -9,6 +9,7 @@ import {
   MinLength,
   IsDateString
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateBookDto {
@@ -38,6 +39,7 @@ export class CreateBookDto {
     example: 29.99,
     minimum: 0.01,
   })
+  @Transform(({ value }) => typeof value === 'string' ? parseFloat(value) : value)
   @IsNumber()
   @IsPositive()
   price!: number;
@@ -45,6 +47,12 @@ export class CreateBookDto {
   @ApiProperty({
     description: 'Disponibilidad del libro',
     example: true,
+  })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value === 'true' || value === '1';
+    }
+    return value;
   })
   @IsBoolean()
   available!: boolean;
@@ -79,14 +87,18 @@ export class CreateBookDto {
     minimum: 0,
   })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === null || value === undefined || value === '') return undefined;
+    return typeof value === 'string' ? parseInt(value, 10) : value;
+  })
   @IsNumber()
   stock?: number;
 
   @ApiPropertyOptional({
-    description: 'URL de la imagen del libro',
-    example: 'https://example.com/book-cover.jpg',
+    description: 'Imagen del libro en formato base64',
+    example: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
   })
   @IsOptional()
   @IsString()
-  imageUrl?: string;
+  imageBase64?: string;
 }

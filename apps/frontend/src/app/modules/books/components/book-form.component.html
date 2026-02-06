@@ -22,18 +22,14 @@
 
         <!-- Fecha de Publicación -->
         <div class="form-group">
-          <label for="publicationDate">Fecha de Publicación *</label>
+          <label for="publicationDate">Fecha de Publicación</label>
           <input
             type="date"
             id="publicationDate"
             formControlName="publicationDate"
             class="form-control"
-            [class.is-invalid]="bookForm.get('publicationDate')?.invalid && bookForm.get('publicationDate')?.touched"
             [readonly]="isEditMode"
           />
-          <div class="invalid-feedback" *ngIf="bookForm.get('publicationDate')?.invalid && bookForm.get('publicationDate')?.touched">
-            La fecha es requerida
-          </div>
         </div>
 
         <!-- Autor -->
@@ -119,6 +115,21 @@
           <div class="invalid-feedback" *ngIf="bookForm.get('price')?.invalid && bookForm.get('price')?.touched">
             <div *ngIf="bookForm.get('price')?.errors?.['required']">El precio es requerido</div>
             <div *ngIf="bookForm.get('price')?.errors?.['min']">El precio debe ser mayor o igual a 0</div>
+          </div>
+        </div>
+
+        <!-- Disponible -->
+        <div class="form-group">
+          <div class="form-check">
+            <input
+              type="checkbox"
+              id="available"
+              formControlName="available"
+              class="form-check-input"
+            />
+            <label class="form-check-label" for="available">
+              Disponible
+            </label>
           </div>
         </div>
 

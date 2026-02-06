@@ -26,6 +26,25 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
+        isActive: user.isActive,
+      },
+    };
+  }
+
+  async publicRegister(registerDto: RegisterDto) {
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const user = await this.usersService.create({
+      ...registerDto,
+      password: hashedPassword,
+    });
+
+    // No devolvemos token, solo confirmación de registro
+    return {
+      message: 'Usuario registrado exitosamente. Espere la activación por un administrador.',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
       },
     };
   }
@@ -41,6 +60,11 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    // Validar que el usuario esté activo
+    if (!user.isActive) {
+      throw new UnauthorizedException('Usuario inactivo. Contacte al administrador.');
+    }
+
     const payload = { sub: user.id, email: user.email, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
@@ -49,6 +73,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
+        isActive: user.isActive,
       },
     };
   }

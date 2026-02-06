@@ -167,6 +167,25 @@ export class BooksListComponent implements OnInit, OnDestroy {
     }
   }
 
+  exportCSV(): void {
+    this.bookService.exportCSV().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `books-${new Date().getTime()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        this.error = error.error?.message || 'Error al exportar CSV';
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   get pages(): number[] {
     const pages: number[] = [];
     for (let i = 1; i <= this.totalPages; i++) {

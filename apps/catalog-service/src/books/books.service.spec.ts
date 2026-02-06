@@ -50,7 +50,7 @@ describe('BooksService', () => {
     title: 'Harry Potter',
     price: 29.99,
     available: true,
-    imageUrl: 'https://example.com/image.jpg',
+    imageBase64: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
     authorId: 'author-123',
     publisherId: 'publisher-123',
     genreId: 'genre-123',
@@ -144,7 +144,7 @@ describe('BooksService', () => {
       title: 'Harry Potter',
       price: 29.99,
       available: true,
-      imageUrl: 'https://example.com/image.jpg',
+      imageBase64: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
       authorId: 'author-123',
       publisherId: 'publisher-123',
       genreId: 'genre-123',
@@ -723,7 +723,7 @@ describe('BooksService', () => {
         author: null,
         publisher: null,
         genre: null,
-        imageUrl: null,
+        imageBase64: null,
       };
       const filterDto: FilterBookDto = {};
       const mockQueryBuilder = {
