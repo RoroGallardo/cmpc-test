@@ -33,9 +33,20 @@ cmpc-test/
 │   ├── auth-service/          # Microservicio de autenticación y usuarios
 │   ├── catalog-service/       # Microservicio de catálogo (libros, ventas)
 │   ├── analytics-service/     # Microservicio de analytics, predicciones y reportes
-│   └── analytics-worker/      # Worker para procesamiento asíncrono de analytics
-└── libs/
-    └── shared/                # Código compartido (entidades, DTOs, interfaces)
+│   ├── analytics-worker/      # Worker para procesamiento asíncrono de analytics
+│   └── frontend/              # Aplicación Angular (Puerto 4200)
+├── libs/
+│   ├── shared/                # Código compartido (entidades, DTOs, interfaces)
+│   └── utils/                 # Utilidades compartidas
+├── docs/                      # Documentación técnica completa
+│   ├── README_DOCS.md         # Índice de documentación
+│   ├── ARCHITECTURE.md        # Arquitectura del sistema
+│   ├── USE_CASES.md           # Casos de uso con diagramas
+│   ├── DATABASE_SCHEMA.md     # Esquema de base de datos
+│   ├── SEQUENCE_DIAGRAMS.md   # Diagramas de secuencia
+│   ├── COMPONENTS_DEPLOYMENT.md # Componentes y deployment
+│   └── bruno/                 # Colección de pruebas API
+└── scripts/                   # Scripts de utilidad
 ```
 
 ## Arquitectura
@@ -152,12 +163,12 @@ awk '{printf "%s\\n", $0}' jwt.public.pem
 **Variables importantes:**
 - `JWT_PRIVATE_KEY`: Clave privada RSA (solo para auth-service)
 - `JWT_PUBLIC_KEY`: Clave pública RSA (compartida, para validar)
-- `AUTH_PORT` y `CATALOG_PORT`: Puertos de cada servicio
+- `AUTH_PORT`, `CATALOG_PORT` y `ANALYTICS_WORKER_PORT` : Puertos de cada servicio
 - `DB_*`: Configuración de la base de datos PostgreSQL compartida
 
 ## Base de Datos
 
-Ambos microservicios comparten la misma base de datos PostgreSQL: `cmpc_db`
+Los microservicios comparten la misma base de datos PostgreSQL: `cmpc_db`
 
 Crear la base de datos:
 ```sql
@@ -243,7 +254,52 @@ node dist/apps/analytics-service/main.js
 node dist/apps/analytics-worker/main.js
 ```
 
-## Documentación API
+## 📚 Documentación Completa
+
+### Documentación Técnica con Diagramas
+
+El proyecto cuenta con documentación técnica completa con más de 50 diagramas Mermaid:
+
+📖 **[Índice de Documentación](docs/README_DOCS.md)** - Punto de entrada a toda la documentación
+
+#### Documentos Principales:
+
+1. **[Arquitectura del Sistema](docs/ARCHITECTURE.md)**
+   - Arquitectura de microservicios
+   - Flujos de comunicación
+   - Infraestructura y deployment
+   - Patrones de diseño implementados
+   - Stack tecnológico completo
+
+2. **[Casos de Uso](docs/USE_CASES.md)**
+   - Diagramas de casos de uso por módulo
+   - Flujos de autenticación
+   - Procesos de catálogo y ventas
+   - Analytics y predicciones
+   - Sistema de alertas automáticas
+
+3. **[Esquema de Base de Datos](docs/DATABASE_SCHEMA.md)**
+   - Diagrama ER completo (14 tablas)
+   - Relaciones entre entidades
+   - Índices y optimizaciones
+   - Queries comunes
+   - Estrategias de migración
+
+4. **[Diagramas de Secuencia](docs/SEQUENCE_DIAGRAMS.md)**
+   - Flujos de autenticación JWT
+   - Proceso completo de ventas
+   - Analytics en tiempo real
+   - Generación de predicciones con IA
+   - Sistema de alertas con cron jobs
+
+5. **[Componentes y Deployment](docs/COMPONENTS_DEPLOYMENT.md)**
+   - Arquitectura de componentes
+   - Deployment en desarrollo y producción
+   - Estructura del monorepo
+   - Diagramas de clases
+   - Máquinas de estado
+
+### Documentación API (Swagger)
 
 Cada microservicio tiene su propia documentación Swagger:
 
@@ -304,14 +360,19 @@ import {
   FilterBookDto 
 } from '@cmpc-test/shared';
 ```
-
-## Tecnologías
-
-- **Monorepo**: Nx
-- **Framework**: NestJS
-- **Base de datos**: PostgreSQL
-- **ORM**: TypeORM
-- **Autenticación**: Passport + JWT (RS256)
+ 20.x
+- **Backend Framework**: NestJS 10.x
+- **Frontend Framework**: Angular 18.x
+- **Base de datos**: PostgreSQL 15
+- **ORM**: TypeORM 0.3.x
+- **Message Broker**: Redpanda/Kafka (compatible)
+- **Autenticación**: Passport + JWT (RS256 - criptografía asimétrica)
+- **Validación**: class-validator
+- **Documentación**: Swagger/OpenAPI
+- **Logger**: Winston (configuración centralizada)
+- **IA/ML**: TensorFlow.js (predicciones de demanda)
+- **Testing**: Jest 29.x
+- **Language**: TypeScript 5.x
 - **Validación**: class-validator
 - **Documentación**: Swagger
 - **Logger**: Winston (configuración centralizada)
@@ -414,7 +475,7 @@ libs/shared/
 - **Análisis de Ventas:** Por día, categoría, autor, editorial
 - **Métricas de Inventario:** Valor total, rotación, stock crítico
 
-### Análisis Predictivo con IA
+### Análisis Predictivo
 - **Predicción de Demanda:** Algoritmo de media móvil exponencial
 - **Recomendaciones Inteligentes:** Sugerencias de reabastecimiento
 - **Análisis de Tendencias:** Detección de patrones de venta
@@ -426,7 +487,7 @@ libs/shared/
 - **Rotación de Stock:** Identificación de productos de rápido/lento movimiento
 - **Audit Trail:** Trazabilidad completa de cambios
 
-### Sistema de Alertas Automáticas
+### Sistema de Alertas Automáticas (por implementar en el frontend)
 - Alertas de stock bajo y sin stock
 - Detección de alta demanda
 - Identificación de baja rotación
@@ -439,7 +500,7 @@ libs/shared/
 - Usuario, IP, timestamp
 - Auditoría de CRUD completo
 
-## Próximos Pasos
+## Resumen Pasos
 
 1. Copiar `.env.example` a `.env` en la raíz del proyecto
 2. Generar claves JWT RSA: `./scripts/generate-jwt-keys.sh`
@@ -447,9 +508,9 @@ libs/shared/
 4. Configurar las demás variables de entorno (puertos, base de datos)
 5. Crear la base de datos PostgreSQL: `CREATE DATABASE cmpc_db;`
 6. Ejecutar `npm install` en la raíz del proyecto
-7. Iniciar ambos microservicios
+7. Iniciar los microservicios y workers
 8. Probar los endpoints con Swagger o Postman
-9. Integrar con tu aplicación frontend
+9. Levantar frontend
 
 ## Notas Importantes
 
@@ -465,9 +526,13 @@ libs/shared/
 - **Worker dedicado**: analytics-worker procesa eventos en background sin bloquear requests
 
 ### Funcionalidades Avanzadas
-- **Analytics en Tiempo Real**: Actualización automática mediante worker de Kafka
-- **Predicción de Demanda**: IA para optimizar inventario
-- **Sistema de Alertas**: Cron jobs ejecutan verificaciones cada hora
+- **Documentación Técnica Completa**: 60+ páginas con 50+ diagramas Mermaid
+  - Ver [docs/README_DOCS.md](docs/README_DOCS.md) para el índice completo
+  - Arquitectura, casos de uso, base de datos, secuencias, componentes
+- **Swagger UI**: Disponible en todos los servicios backend
+- **Bruno Collection**: Tests completos de API en `docs/bruno/`
+- **Diagramas Interactivos**: Todos los diagramas en formato Mermaid
+  - Compatibles con GitHub, VS Code, GitLab, Confluencehora
 - **Reportes de Negocio**: Análisis ABC, rentabilidad, estacionalidad
 
 ### Código Compartido

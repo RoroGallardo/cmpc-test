@@ -2,10 +2,10 @@ import { Injectable, Logger, OnModuleInit, Scope } from '@nestjs/common';
 import { ClientKafka, Client, Transport } from '@nestjs/microservices';
 
 /**
- * Singleton Kafka Producer Service
+ *  Kafka Producer Service
  * Se puede usar en cualquier aplicación que necesite publicar eventos a Kafka
  */
-@Injectable({ scope: Scope.DEFAULT }) // Singleton por defecto
+@Injectable({ scope: Scope.DEFAULT }) //  por defecto
 export class KafkaProducerService implements OnModuleInit {
   private readonly logger = new Logger(KafkaProducerService.name);
   private static instance: KafkaProducerService;
@@ -39,7 +39,7 @@ export class KafkaProducerService implements OnModuleInit {
     });
 
     await this.client.connect();
-    this.logger.log('✅ Kafka producer connected (Singleton)');
+    this.logger.log('✅ Kafka producer connected');
   }
 
   /**
@@ -51,7 +51,7 @@ export class KafkaProducerService implements OnModuleInit {
   }
 
   /**
-   * Obtener la instancia singleton
+   * Obtener la instancia 
    */
   static getInstance(): KafkaProducerService {
     if (!KafkaProducerService.instance) {
