@@ -10,45 +10,56 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: cmpc_db
     ports:
-      - '5433:5432'
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - cmpc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # Redpanda (Kafka compatible, sin Zookeeper)
   redpanda:
-    image: docker.redpanda.com/redpandadata/redpanda:v23.3.5
+    image: docker.redpanda.com/redpandadata/redpanda:latest
     container_name: cmpc-redpanda
     command:
       - redpanda
       - start
-      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
-      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
-      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
-      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
-      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
-      - --rpc-addr redpanda:33145
-      - --advertise-rpc-addr redpanda:33145
-      - --mode dev-container
-      - --smp 1
-      - --default-log-level=info
-      - --admin-api-addr internal://0.0.0.0:9644,external://0.0.0.0:19644
-      - --advertise-admin-api-addr internal://redpanda:9644,external://localhost:19644
+      - --smp
+      - "1"
+      - --overprovisioned
+      - --kafka-addr
+      - internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr
+      - internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr
+      - internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr
+      - internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr
+      - internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr
+      - redpanda:33145
+      - --advertise-rpc-addr
+      - redpanda:33145
     ports:
       - '19092:19092' # Kafka API (externo)
       - '18081:18081' # Schema Registry (externo)
       - '18082:18082' # Pandaproxy (externo)
-      - '9644:9644' # Admin API (externo)
+      - '9644:9644'   # Admin API (externo)
     volumes:
       - redpanda_data:/var/lib/redpanda/data
     networks:
       - cmpc-network
     healthcheck:
-      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
-      interval: 15s
-      timeout: 3s
-      retries: 5
+      test: ["CMD-SHELL", "rpk cluster info"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   console:
     image: docker.redpanda.com/redpandadata/console:v2.4.0
@@ -69,9 +80,74 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - redpanda
+      redpanda:
+        condition: service_healthy
 
-  # Analytics Service (nuevo)
+  # Auth Service
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: auth-service
+    container_name: cmpc-auth-service
+    ports:
+      - '3001:3001'
+    environment:
+      - AUTH_PORT=3001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=cmpc_db
+      - JWT_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n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\nSVxXiKlzvSzOVWR7ilC9l+ILNtS6Mw==\n-----END PRIVATE KEY-----\n
+      - JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA8LCk/UYMdLbsFsyP7d+q\nMxCfTzt920S/sj8J4BgsliGbF5pnDsMp38qPj4dm7a7Fh8Fb/rH6krqeeEMzUGRN\nMGXMjmLJcxh5JgQeWpUYTYXsX/XsItrVizdvTI26/VTI6KRHmIXnHAsyZwMCIz5q\nOxkSysfngIJzbVVa4f4sBi0dXrE+LBF60Uvn2vkureBZXrYORLDKxK3BWDSt1S0d\ny8UL8tCYWxbiZu83fC11n/4e7t2VjRPP+nJouZ1O04AtN2N98qf8HdWZWtmV4B+0\n6a4E7KlY/3gaSc56M3acRLNn94TyGrflhd11n5JGWilI/fRRL8uu9lDWY1gKkJKa\na82LJLfOr3x74kSz+Z2UDuZLnuvtz/AcHsLC0KduJ+L6hjSYvR1SVBn/QLX+opO0\nGpkXxapgneDbCZW/hDp8qejQMzOQo4uUCosV3CFOnn+bJn3mrmpUYvhUD1XrtcGg\n2t+zfu06mkTrOD5IZzyZ4VzqL+e0JUSx6plOcd/RKl5eFlv4K11WT+1E1uB1hG1U\nnq/ELkyo/6GyRFkpY79Z0e1hLTBPnG3gtdg6NMN/6BOCiOWPgLnLrLvlsh9TxDbx\nd/SLMvrPGQe9Qy+sEE2g0elCYAtsiAfLYAYbyFEh+mwB4zexnbeWPAyEtxbSXsU/\nZ2Z9SWyAVdzMnpcj59QsRuECAwEAAQ==\n-----END PUBLIC KEY-----\n
+      - JWT_EXPIRATION=1h
+      - KAFKA_BROKERS=redpanda:9092
+      - ADMIN_EMAIL=admin@cmpc.com
+      - ADMIN_PASSWORD=Admin123!Secure
+      - ADMIN_NAME=Administrador Principal
+      - NODE_ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    networks:
+      - cmpc-network
+    restart: unless-stopped
+
+  # Catalog Service
+  catalog-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: catalog-service
+    container_name: cmpc-catalog-service
+    ports:
+      - '3002:3002'
+    environment:
+      - CATALOG_PORT=3002
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=cmpc_db
+      - JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA8LCk/UYMdLbsFsyP7d+q\nMxCfTzt920S/sj8J4BgsliGbF5pnDsMp38qPj4dm7a7Fh8Fb/rH6krqeeEMzUGRN\nMGXMjmLJcxh5JgQeWpUYTYXsX/XsItrVizdvTI26/VTI6KRHmIXnHAsyZwMCIz5q\nOxkSysfngIJzbVVa4f4sBi0dXrE+LBF60Uvn2vkureBZXrYORLDKxK3BWDSt1S0d\ny8UL8tCYWxbiZu83fC11n/4e7t2VjRPP+nJouZ1O04AtN2N98qf8HdWZWtmV4B+0\n6a4E7KlY/3gaSc56M3acRLNn94TyGrflhd11n5JGWilI/fRRL8uu9lDWY1gKkJKa\na82LJLfOr3x74kSz+Z2UDuZLnuvtz/AcHsLC0KduJ+L6hjSYvR1SVBn/QLX+opO0\nGpkXxapgneDbCZW/hDp8qejQMzOQo4uUCosV3CFOnn+bJn3mrmpUYvhUD1XrtcGg\n2t+zfu06mkTrOD5IZzyZ4VzqL+e0JUSx6plOcd/RKl5eFlv4K11WT+1E1uB1hG1U\nnq/ELkyo/6GyRFkpY79Z0e1hLTBPnG3gtdg6NMN/6BOCiOWPgLnLrLvlsh9TxDbx\nd/SLMvrPGQe9Qy+sEE2g0elCYAtsiAfLYAYbyFEh+mwB4zexnbeWPAyEtxbSXsU/\nZ2Z9SWyAVdzMnpcj59QsRuECAwEAAQ==\n-----END PUBLIC KEY-----\n
+      - KAFKA_BROKERS=redpanda:9092
+      - KAFKA_CLIENT_ID=catalog-service
+      - NODE_ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    networks:
+      - cmpc-network
+    restart: unless-stopped
+
+  # Analytics Service
   analytics-service:
     build:
       context: .
@@ -82,16 +158,74 @@ services:
     ports:
       - '3003:3003'
     environment:
-      - PORT=3003
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
-      - DATABASE_NAME=cmpc_test
+      - ANALYTICS_PORT=3003
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=cmpc_db
+      - JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA8LCk/UYMdLbsFsyP7d+q\nMxCfTzt920S/sj8J4BgsliGbF5pnDsMp38qPj4dm7a7Fh8Fb/rH6krqeeEMzUGRN\nMGXMjmLJcxh5JgQeWpUYTYXsX/XsItrVizdvTI26/VTI6KRHmIXnHAsyZwMCIz5q\nOxkSysfngIJzbVVa4f4sBi0dXrE+LBF60Uvn2vkureBZXrYORLDKxK3BWDSt1S0d\ny8UL8tCYWxbiZu83fC11n/4e7t2VjRPP+nJouZ1O04AtN2N98qf8HdWZWtmV4B+0\n6a4E7KlY/3gaSc56M3acRLNn94TyGrflhd11n5JGWilI/fRRL8uu9lDWY1gKkJKa\na82LJLfOr3x74kSz+Z2UDuZLnuvtz/AcHsLC0KduJ+L6hjSYvR1SVBn/QLX+opO0\nGpkXxapgneDbCZW/hDp8qejQMzOQo4uUCosV3CFOnn+bJn3mrmpUYvhUD1XrtcGg\n2t+zfu06mkTrOD5IZzyZ4VzqL+e0JUSx6plOcd/RKl5eFlv4K11WT+1E1uB1hG1U\nnq/ELkyo/6GyRFkpY79Z0e1hLTBPnG3gtdg6NMN/6BOCiOWPgLnLrLvlsh9TxDbx\nd/SLMvrPGQe9Qy+sEE2g0elCYAtsiAfLYAYbyFEh+mwB4zexnbeWPAyEtxbSXsU/\nZ2Z9SWyAVdzMnpcj59QsRuECAwEAAQ==\n-----END PUBLIC KEY-----\n
+      - KAFKA_BROKERS=redpanda:9092
+      - NODE_ENV=development
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
     networks:
       - cmpc-network
+    restart: unless-stopped
+
+  # Analytics Worker
+  analytics-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: analytics-worker
+    container_name: cmpc-analytics-worker
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=cmpc_db
+      - KAFKA_BROKERS=redpanda:9092
+      - KAFKA_GROUP_ID=analytics-worker-group
+      - KAFKA_CLIENT_ID=analytics-worker
+      - NODE_ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    networks:
+      - cmpc-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: cmpc-frontend
+    ports:
+      - '4200:80'
+    environment:
+      - API_AUTH_URL=http://auth-service
+      - API_CATALOG_URL=http://catalog-service
+      - API_ANALYTICS_URL=http://analytics-service
+      - AUTH_PORT=3001
+      - CATALOG_PORT=3002
+      - ANALYTICS_PORT=3003
+      - NODE_ENV=development
+    depends_on:
+      - auth-service
+      - catalog-service
+      - analytics-service
+    networks:
+      - cmpc-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:

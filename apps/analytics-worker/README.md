@@ -36,7 +36,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
-DB_DATABASE=cmpc_test
+DB_DATABASE=cmpc_db
 ```
 
 ## Ejecución

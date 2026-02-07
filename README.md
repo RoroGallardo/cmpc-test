@@ -121,6 +121,57 @@ Biblioteca compartida que contiene:
 npm install
 ```
 
+## 🐳 Inicio Rápido con Docker
+
+La forma más rápida de ejecutar todo el workspace es usando Docker Compose:
+
+```bash
+# 1. Levantar todos los servicios
+docker-compose up -d
+
+# O usar el script de gestión
+./docker.sh start
+
+# 2. Ver los logs
+docker-compose logs -f
+
+# 3. Ver el estado de los servicios
+docker-compose ps
+```
+
+**Servicios disponibles:**
+- 🔐 Auth Service: http://localhost:3001/api/docs
+- 📚 Catalog Service: http://localhost:3002/api/docs
+- 📊 Analytics Service: http://localhost:3003/api/docs
+- 🎨 Frontend: http://localhost:4200
+- 🔍 Redpanda Console: http://localhost:8080
+- 💾 PostgreSQL: localhost:5433
+
+**Gestión rápida:**
+```bash
+./docker.sh start          # Iniciar todos los servicios
+./docker.sh stop           # Detener servicios
+./docker.sh logs-f         # Ver logs en tiempo real
+./docker.sh status         # Estado de los servicios
+./docker.sh health         # Verificar salud de los servicios
+./docker.sh rebuild        # Reconstruir e iniciar
+./docker.sh clean-all      # Limpieza completa
+```
+
+**Ejecución selectiva:**
+```bash
+# Solo infraestructura (DB y Kafka)
+./docker.sh start-infra
+
+# Solo servicios backend
+./docker.sh start-backend
+
+# Solo frontend
+./docker.sh start-frontend
+```
+
+📖 **[Guía Completa de Docker](DOCKER_GUIDE.md)** - Documentación detallada sobre Docker
+
 ## Configuración
 
 ### Variables de Entorno
@@ -161,7 +212,7 @@ awk '{printf "%s\\n", $0}' jwt.public.pem
 **Variables importantes:**
 - `JWT_PRIVATE_KEY`: Clave privada RSA (solo para auth-service)
 - `JWT_PUBLIC_KEY`: Clave pública RSA (compartida, para validar)
-- `AUTH_PORT`, `CATALOG_PORT` y `ANALYTICS_WORKER_PORT` : Puertos de cada servicio
+- `AUTH_PORT`, `CATALOG_PORT` y `ANALYTICS_PORT` : Puertos de cada servicio
 - `DB_*`: Configuración de la base de datos PostgreSQL compartida
 
 ## Base de Datos

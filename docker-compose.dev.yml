@@ -1,0 +1,109 @@
+version: '3.8'
+
+# Docker Compose para desarrollo local
+# Solo infraestructura (DB + Kafka), servicios se ejecutan localmente con hot-reload
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cmpc-postgres-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cmpc_db
+    ports:
+      - '5432:5432'  # Puerto estándar para desarrollo local
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - cmpc-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redpanda (Kafka compatible)
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.5
+    container_name: cmpc-redpanda-dev
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+      - --admin-api-addr internal://0.0.0.0:9644,external://0.0.0.0:19644
+      - --advertise-admin-api-addr internal://redpanda:9644,external://localhost:19644
+    ports:
+      - '19092:19092' # Kafka API (externo)
+      - '18081:18081' # Schema Registry (externo)
+      - '18082:18082' # Pandaproxy (externo)
+      - '9644:9644'   # Admin API (externo)
+    volumes:
+      - redpanda_dev_data:/var/lib/redpanda/data
+    networks:
+      - cmpc-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+
+  # Redpanda Console
+  console:
+    image: docker.redpanda.com/redpandadata/console:v2.4.0
+    container_name: cmpc-redpanda-console-dev
+    networks:
+      - cmpc-dev-network
+    entrypoint: /bin/sh
+    command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda:9092"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda:9644"]
+    ports:
+      - 8080:8080
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+  # PgAdmin (opcional, para gestionar la base de datos visualmente)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: cmpc-pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cmpc.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - '5050:80'
+    volumes:
+      - pgadmin_dev_data:/var/lib/pgadmin
+    networks:
+      - cmpc-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_dev_data:
+  redpanda_dev_data:
+  pgadmin_dev_data:
+
+networks:
+  cmpc-dev-network:
+    driver: bridge
