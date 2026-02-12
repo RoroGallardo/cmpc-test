@@ -1,0 +1,53 @@
+# Dockerfile para aplicación Next.js con Nx
+# Stage 1: Dependencies
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+RUN npm ci --legacy-peer-deps
+
+# Stage 2: Builder
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copiar dependencias desde deps
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copiar archivos de configuración
+COPY package*.json ./
+COPY nx.json ./
+COPY tsconfig.json ./
+COPY tsconfig.base.json ./
+
+# Copiar código fuente
+COPY bookstore-next/ ./bookstore-next/
+COPY libs/ ./libs/
+
+# Build de la aplicación Next.js con Nx
+RUN npx nx build bookstore-next --configuration=production
+
+# Stage 3: Runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copiar archivos necesarios
+COPY --from=builder /app/dist/bookstore-next/.next/standalone ./
+COPY --from=builder /app/dist/bookstore-next/.next/static ./dist/bookstore-next/.next/static
+COPY --from=builder /app/dist/bookstore-next/public ./dist/bookstore-next/public
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "dist/bookstore-next/server.js"]

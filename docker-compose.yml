@@ -227,6 +227,27 @@ services:
       - cmpc-network
     restart: unless-stopped
 
+  # Bookstore Next.js
+  bookstore-next:
+    build:
+      context: .
+      dockerfile: Dockerfile.nextjs
+    container_name: cmpc-bookstore-next
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_AUTH_URL=http://localhost:3001
+      - NEXT_PUBLIC_API_CATALOG_URL=http://localhost:3002
+      - NEXT_PUBLIC_API_ANALYTICS_URL=http://localhost:3003
+    depends_on:
+      - auth-service
+      - catalog-service
+      - analytics-service
+    networks:
+      - cmpc-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redpanda_data:

@@ -8,6 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY nx.json ./
 COPY tsconfig.json ./
+COPY tsconfig.base.json ./
 
 # Instalar dependencias
 RUN npm ci --legacy-peer-deps

@@ -10,6 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY nx.json ./
 COPY tsconfig.json ./
+COPY tsconfig.base.json ./
 COPY jest.config.ts ./
 COPY jest.preset.js ./
 
