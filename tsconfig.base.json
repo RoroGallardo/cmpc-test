@@ -1,0 +1,17 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "sourceMap": true,
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ES2021",
+    "module": "commonjs",
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@cmpc-test/shared": ["libs/shared/src/index.ts"],
+      "@cmpc-test/utils": ["libs/utils/src/index.ts"]
+    }
+  }
+}

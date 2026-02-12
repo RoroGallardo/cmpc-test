@@ -1,27 +1,16 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
     "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": ".",
     "incremental": true,
-    "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "paths": {
-      "@cmpc-test/shared": ["libs/shared/src/index.ts"],
-      "@cmpc-test/utils": ["libs/utils/src/index.ts"]
-    }
-  }
+    "resolveJsonModule": true
+  },
+  "extends": "./tsconfig.base.json"
 }

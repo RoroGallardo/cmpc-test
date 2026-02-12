@@ -1,0 +1,51 @@
+{
+  "name": "bookstore-next",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "bookstore-next",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/bookstore-next"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "bookstore-next"
+        },
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "bookstore-next:build",
+        "dev": true,
+        "port": 4200
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "bookstore-next:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "bookstore-next:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nx/next:export",
+      "options": {
+        "buildTarget": "bookstore-next:build:production"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
